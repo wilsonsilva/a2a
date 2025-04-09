@@ -17,7 +17,7 @@ module A2A
     def initialize
       @current_task_id = SecureRandom.uuid
       @server_url = ARGV[0] || 'http://localhost:41241'
-      @client = Client.new(base_url: @server_url)
+      @client = Client.new(url: @server_url)
       @agent_name = 'Agent' # Default, try to get from agent card later
       @pastel = Pastel.new
     end

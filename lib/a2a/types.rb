@@ -2,45 +2,40 @@
 
 require 'dry-struct'
 require 'dry-types'
-require 'json' # For JSON::Any potentially, though Types::Hash might suffice
-require 'time' # For ISO8601 parsing/formatting
+require 'json'
+require 'time' # Required for ISO 8601 time formatting
+require 'securerandom' # Required for default IDs
+require 'active_support/all'
 
-# Namespace for all A2A Protocol definitions
 module A2A
-  # Base module for Dry::Types definitions
+  # Namespace for Dry::Types definitions
   module Types
     include Dry.Types()
 
-    # JSON-RPC ID can be String, Integer, or Nil
-    ID = Strict::Integer | Strict::String | Strict::Nil
+    # Custom type for ISO 8601 DateTime strings
+    IsoDateTime = Types::String.constructor do |value|
+      case value
+      when Time, DateTime
+        value.iso8601
+      when String
+        # Attempt to parse to ensure it's a valid format, then return original string
+        begin
+          Time.iso8601(value)
+          value
+        rescue ArgumentError
+          # Or raise a specific type error if strict validation is needed upstream
+          value # Pass through for now, let struct validation handle if needed
+        end
+      else
+        value
+      end
+    end
 
-    # Optional types
-    MaybeString = Strict::String | Strict::Nil
-    # Use Types::Hash for arbitrary hash structures
-    MaybeHash = Hash.optional.default(nil)
-    MaybeArrayOfStrings = Types::Array.of(Strict::String).optional.default(nil) # Corrected optional array
-    MaybeBool = Strict::Bool | Strict::Nil
-
-    # Timestamp as ISO8601 string
-    Timestamp = Strict::String.constrained(format: /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[\+\-]\d{2}:\d{2})\z/i)
-
-    # Base64 encoded string
-    Base64String = Strict::String
-
-    # Generic metadata hash - MUST accept any hash structure
-    # Use the base Hash type, mark as optional, default to nil.
-    Metadata = Types::Hash.optional.default(nil)
-
-    # Generic JSON object - MUST accept any hash structure
-    # Use the base Hash type.
-    JsonObject = Types::Hash
-
-    # Generic JSON data (can be primitive, array, or hash)
-    # Using Any is safer if it's truly unknown JSON structure
-    JsonData = Types::Any.optional.default(nil) # Using Any allows non-hash JSON too
+    # Define Nil explicitly for union types where needed
+    Nil = Types::Nil
   end
 
-  # Base class for A2A Structs
+  # Base class for all A2A structures
   class BaseStruct < Dry::Struct
     # Transform keys to symbols if input is string-keyed hash
     transform_keys(&:to_sym)
@@ -51,317 +46,231 @@ module A2A
     end
   end
 
-  # === JSON-RPC Base Structures ===
+  # --- Agent Card Types ---
 
-  # Base for identifying JSON-RPC messages
-  class JSONRPCMessageIdentifier < BaseStruct
-    attribute? :id, Types::ID
-  end
-
-  # Base for all JSON-RPC messages
-  class JSONRPCMessage < JSONRPCMessageIdentifier
-    attribute? :jsonrpc, Types::String.constrained(eql: '2.0').default('2.0')
-  end
-
-  # Represents a JSON-RPC request object base structure
-  class JSONRPCRequest < JSONRPCMessage
-    attribute :method, Types::Strict::String
-    attribute? :params, Types::JsonData # Use flexible JsonData
-  end
-
-  # Represents a JSON-RPC error object
-  class JSONRPCError < BaseStruct
-    attribute :code, Types::Strict::Integer | Types::Strict::String
-    attribute :message, Types::Strict::String
-    attribute? :data, Types::JsonData # Use flexible JsonData
-  end
-
-  # Represents a JSON-RPC response object
-  class JSONRPCResponse < JSONRPCMessage
-    attribute? :result, Types::JsonData # Use flexible JsonData
-    attribute? :error, JSONRPCError.optional.default(nil)
-  end
-
-  # === Core A2A Data Structures ===
-
-  # Represents the state of a task within the A2A protocol
-  TaskState = Types::Strict::String.enum(
-    'submitted',
-    'working',
-    'input-required',
-    'completed',
-    'canceled',
-    'failed',
-    'unknown'
-  )
-
-  # Defines the authentication schemes and credentials for an agent
-  class AgentAuthentication < BaseStruct
-    attribute :schemes, Types::Strict::Array.of(Types::Strict::String)
-    attribute? :credentials, Types::MaybeString
-  end
-
-  # Describes the capabilities of an agent
-  class AgentCapabilities < BaseStruct
-    attribute? :streaming, Types::Strict::Bool.default(false)
-    attribute? :push_notifications, Types::Strict::Bool.default(false)
-    attribute? :state_transition_history, Types::Strict::Bool.default(false)
-  end
-
-  # Represents the provider or organization behind an agent
   class AgentProvider < BaseStruct
     attribute :organization, Types::Strict::String
-    attribute? :url, Types::MaybeString
+    attribute? :url, Types::Strict::String.optional
   end
 
-  # Defines a specific skill or capability offered by an agent
+  class AgentCapabilities < BaseStruct
+    attribute :streaming, Types::Strict::Bool.default(false)
+    attribute :push_notifications, Types::Strict::Bool.default(false)
+    attribute :state_transition_history, Types::Strict::Bool.default(false)
+  end
+
+  class AgentAuthentication < BaseStruct
+    attribute :schemes, Types::Strict::Array.of(Types::Strict::String)
+    attribute? :credentials, Types::Strict::String.optional
+  end
+
   class AgentSkill < BaseStruct
     attribute :id, Types::Strict::String
     attribute :name, Types::Strict::String
-    attribute? :description, Types::MaybeString
-    attribute? :tags, Types::MaybeArrayOfStrings
-    attribute? :examples, Types::MaybeArrayOfStrings
-    attribute? :input_modes, Types::MaybeArrayOfStrings
-    attribute? :output_modes, Types::MaybeArrayOfStrings
+    attribute? :description, Types::Strict::String.optional
+    attribute? :tags, Types::Strict::Array.of(Types::Strict::String).optional
+    attribute? :examples, Types::Strict::Array.of(Types::Strict::String).optional
+    attribute? :input_modes, Types::Strict::Array.of(Types::Strict::String).optional
+    attribute? :output_modes, Types::Strict::Array.of(Types::Strict::String).optional
   end
 
-  # Represents the metadata card for an agent
   class AgentCard < BaseStruct
     attribute :name, Types::Strict::String
-    attribute? :description, Types::MaybeString
+    attribute? :description, Types::Strict::String.optional
     attribute :url, Types::Strict::String
-    attribute? :provider, AgentProvider.optional.default(nil)
+    attribute? :provider, AgentProvider.optional
     attribute :version, Types::Strict::String
-    attribute? :documentation_url, Types::MaybeString
+    attribute? :documentation_url, Types::Strict::String.optional
     attribute :capabilities, AgentCapabilities
-    attribute? :authentication, AgentAuthentication.optional.default(nil)
-    attribute? :default_input_modes, Types::Strict::Array.of(Types::Strict::String).default(['text'].freeze)
-    attribute? :default_output_modes, Types::Strict::Array.of(Types::Strict::String).default(['text'].freeze)
+    attribute? :authentication, AgentAuthentication.optional
+    attribute :default_input_modes, Types::Strict::Array.of(Types::Strict::String).default(['text'].freeze)
+    attribute :default_output_modes, Types::Strict::Array.of(Types::Strict::String).default(['text'].freeze)
     attribute :skills, Types::Strict::Array.of(AgentSkill)
   end
 
-  # Base for FileContent variants
-  class FileContentBase < BaseStruct
-    attribute? :name, Types::MaybeString
-    attribute? :mime_type, Types::MaybeString
+  # --- Core Object Types ---
+
+  class FileContent < BaseStruct
+    attribute? :name, Types::Strict::String.optional
+    attribute? :mime_type, Types::Strict::String.optional
+    attribute? :bytes, Types::Strict::String.optional
+    attribute? :uri, Types::Strict::String.optional
   end
 
-  # FileContent with Base64 bytes
-  class FileContentBytes < FileContentBase
-    attribute :bytes, Types::Base64String
-    attribute? :uri, Types::Strict::Nil # Must be nil
-  end
-
-  # FileContent with a URI
-  class FileContentUri < FileContentBase
-    attribute :uri, Types::Strict::String
-    attribute? :bytes, Types::Strict::Nil # Must be nil
-  end
-
-  # Represents the content of a file, either as base64 encoded bytes or a URI.
-  FileContent = FileContentBytes | FileContentUri
-
-  # Represents a part of a message containing text content
+  # Part Types (using separate classes)
   class TextPart < BaseStruct
-    attribute? :type, Types::Strict::String.constrained(eql: 'text').default('text')
+    attribute :type, Types::Strict::String.constrained(eql: 'text').default('text')
     attribute :text, Types::Strict::String
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents a part of a message containing file content
   class FilePart < BaseStruct
-    attribute? :type, Types::Strict::String.constrained(eql: 'file').default('file')
+    attribute :type, Types::Strict::String.constrained(eql: 'file').default('file')
     attribute :file, FileContent
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents a part of a message containing structured data (JSON)
   class DataPart < BaseStruct
-    attribute? :type, Types::Strict::String.constrained(eql: 'data').default('data')
-    attribute :data, Types::JsonObject # Correct: Use the flexible JsonObject type (which is Types::Hash)
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute :type, Types::Strict::String.constrained(eql: 'data').default('data')
+    attribute :data, Types::Strict::Hash # Arbitrary JSON data
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents a single part of a multi-part message.
-  Part = TextPart | FilePart | DataPart
-
-  # Represents an artifact generated or used by a task
-  class Artifact < BaseStruct
-    attribute? :name, Types::MaybeString
-    attribute? :description, Types::MaybeString
-    attribute :parts, Types::Strict::Array.of(Part)
-    attribute? :index, Types::Strict::Integer.default(0)
-    attribute? :append, Types::MaybeBool
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
-    attribute? :last_chunk, Types::MaybeBool
+  # Helper to dynamically create Part instances based on 'type'
+  # Assumes input hash keys might be camelCase or snake_case strings/symbols
+  def self.create_part(hash)
+    # Ensure keys are symbols and snake_cased for internal use
+    sym_hash = hash.deep_transform_keys { |key| key.to_s.underscore.to_sym }
+    type = sym_hash[:type]
+    case type&.to_s
+    when 'text'
+      TextPart.new(sym_hash) # Pass snake_cased hash
+    when 'file'
+      FilePart.new(sym_hash)
+    when 'data'
+      DataPart.new(sym_hash)
+    else
+      raise ArgumentError, "Unknown Part type: #{type}"
+    end
   end
 
-  # Represents a message exchanged between a user and an agent
+
+  # Type definition for an array of Parts using the constructor
+  PartsArray = Types::Strict::Array.constructor do |arr|
+    # Ensure items are hashes before passing to create_part
+    # This allows flexibility if the input array contains already-instantiated parts or raw hashes
+    arr.map { |item| item.is_a?(Hash) ? A2A.create_part(item) : item }
+  end
+
   class Message < BaseStruct
     attribute :role, Types::Strict::String.enum('user', 'agent')
-    attribute :parts, Types::Strict::Array.of(Part)
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute :parts, PartsArray # Uses the constructor type above
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents the status of a task at a specific point in time
+  # Task State Enum (using constants)
+  module TaskState
+    SUBMITTED = 'submitted'.freeze
+    WORKING = 'working'.freeze
+    INPUT_REQUIRED = 'input-required'.freeze
+    COMPLETED = 'completed'.freeze
+    CANCELED = 'canceled'.freeze
+    FAILED = 'failed'.freeze
+    UNKNOWN = 'unknown'.freeze
+    ALL = [SUBMITTED, WORKING, INPUT_REQUIRED, COMPLETED, CANCELED, FAILED, UNKNOWN].freeze
+  end
+
   class TaskStatus < BaseStruct
-    attribute :state, TaskState
-    attribute? :message, Message.optional.default(nil)
-    attribute? :timestamp, Types::JSON::Time.default { Time.now.utc }
+    attribute :state, Types::Strict::String.enum(*TaskState::ALL)
+    attribute? :message, Message.optional
+    attribute :timestamp, Types::IsoDateTime.default { Time.now.iso8601 }
   end
 
-  # Represents a task being processed by an agent
+  class Artifact < BaseStruct
+    attribute? :name, Types::Strict::String.optional
+    attribute? :description, Types::Strict::String.optional
+    attribute :parts, PartsArray # Uses the constructor type
+    attribute? :metadata, Types::Strict::Hash.optional
+    attribute :index, Types::Strict::Integer.default(0)
+    attribute? :append, Types::Strict::Bool.optional
+    attribute? :last_chunk, Types::Strict::Bool.optional
+  end
+
   class Task < BaseStruct
     attribute :id, Types::Strict::String
-    attribute? :session_id, Types::MaybeString
+    attribute? :session_id, Types::Strict::String.optional
     attribute :status, TaskStatus
-    attribute? :artifacts, Types::Strict::Array.of(Artifact).optional.default(nil)
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute? :artifacts, Types::Strict::Array.of(Artifact).optional
+    attribute? :history, Types::Strict::Array.of(Message).optional
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents the history of messages exchanged within a task's session.
-  class TaskHistory < BaseStruct
-    attribute? :message_history, Types::Strict::Array.of(Message).default([].freeze)
-  end
+  # --- Streaming Event Types ---
 
-  # Represents a status update event for a task
   class TaskStatusUpdateEvent < BaseStruct
     attribute :id, Types::Strict::String
     attribute :status, TaskStatus
-    attribute? :final, Types::Strict::Bool.default(false)
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute :final, Types::Strict::Bool.default(false)
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Represents an artifact update event for a task
   class TaskArtifactUpdateEvent < BaseStruct
     attribute :id, Types::Strict::String
     attribute :artifact, Artifact
-    attribute? :final, Types::Strict::Bool.default(false) # Included for consistency
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Alias for backward compatibility (if needed)
-  TaskUpdateEvent = TaskStatusUpdateEvent
+  # --- Push Notification Types ---
 
-  # === Error Types (Standard and A2A) ===
-
-  # Standard JSON-RPC Error Codes
-  ErrorCodeParseError = -32700
-  ErrorCodeInvalidRequest = -32600
-  ErrorCodeMethodNotFound = -32601
-  ErrorCodeInvalidParams = -32602
-  ErrorCodeInternalError = -32603
-
-  # A2A Specific Error Codes (within Server error range)
-  ErrorCodeTaskNotFound = -32001
-  ErrorCodeTaskNotCancelable = -32002
-  ErrorCodePushNotificationNotSupported = -32003
-  ErrorCodeUnsupportedOperation = -32004
-
-  # Union of all well-known error codes defined here
-  KnownErrorCode = Types::Strict::Integer.enum(
-    ErrorCodeParseError,
-    ErrorCodeInvalidRequest,
-    ErrorCodeMethodNotFound,
-    ErrorCodeInvalidParams,
-    ErrorCodeInternalError,
-    ErrorCodeTaskNotFound,
-    ErrorCodeTaskNotCancelable,
-    ErrorCodePushNotificationNotSupported,
-    ErrorCodeUnsupportedOperation
-  )
-
-  # Type alias for A2A errors, allowing known codes or other integers
-  A2AError = JSONRPCError.constructor do |value|
-    # Ensure value is a Hash before accessing keys
-    value = value.to_h if value.respond_to?(:to_h)
-    if value.is_a?(Hash) && value.key?(:code)
-      begin
-        # Try to coerce known code, fallback to original code if it fails or isn't known
-        original_code = value[:code]
-        value[:code] = KnownErrorCode[original_code] rescue original_code
-      rescue TypeError
-        # Keep original code if it's not an integer/coercible
-      end
-    end
-    JSONRPCError.new(value)
+  class AuthenticationInfo < BaseStruct
+    attribute :schemes, Types::Strict::Array.of(Types::Strict::String)
+    attribute? :credentials, Types::Strict::String.optional
   end
 
-  # === Push Notifications and Authentication Info ===
-
-  # Authentication information
-  # Default struct behavior ignores extra keys. No need for `passthrough` here.
-  class AuthenticationInfo < AgentAuthentication
-    # Inherits schemes, credentials from AgentAuthentication
-  end
-
-  # Information required for setting up push notifications
   class PushNotificationConfig < BaseStruct
     attribute :url, Types::Strict::String
-    attribute? :token, Types::MaybeString
-    attribute? :authentication, AuthenticationInfo.optional.default(nil)
+    attribute? :token, Types::Strict::String.optional
+    attribute? :authentication, AuthenticationInfo.optional
   end
 
-  # Represents the push notification information associated with a specific task ID
   class TaskPushNotificationConfig < BaseStruct
     attribute :id, Types::Strict::String # Task ID
     attribute :push_notification_config, PushNotificationConfig
   end
 
-  # === A2A Request Parameter Types ===
+  # --- JSON-RPC Base Types ---
 
-  # Parameters for the `tasks/send` method
-  class TaskSendParams < BaseStruct
-    attribute :id, Types::Strict::String
-    attribute? :session_id, Types::MaybeString
-    attribute :message, Message
-    attribute? :push_notification, PushNotificationConfig.optional.default(nil)
-    attribute? :history_length, Types::Strict::Integer.optional.default(nil)
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+  class JSONRPCMessage < BaseStruct
+    attribute :jsonrpc, Types::Strict::String.constrained(eql: '2.0').default('2.0')
+    attribute? :id, (Types::Strict::String | Types::Strict::Integer | Types::Nil).default { SecureRandom.hex }
   end
 
-  # Basic parameters used for task ID operations
+  class JSONRPCError < BaseStruct
+    attribute :code, Types::Strict::Integer
+    attribute :message, Types::Strict::String
+    attribute? :data, Types::Any
+  end
+
+  class JSONRPCRequest < JSONRPCMessage
+    attribute :method, Types::Strict::String
+    attribute? :params, Types::Strict::Hash.optional
+  end
+
+  class JSONRPCResponse < JSONRPCMessage
+    attribute? :result, Types::Any
+    attribute? :error, JSONRPCError.optional
+  end
+
+  # --- Specific RPC Parameter Types ---
+
   class TaskIdParams < BaseStruct
     attribute :id, Types::Strict::String
-    attribute? :metadata, Types::Metadata # Correct: Use the flexible Metadata type
+    attribute? :metadata, Types::Strict::Hash.optional
   end
 
-  # Parameters used for querying task-related information by ID
   class TaskQueryParams < TaskIdParams
-    attribute? :history_length, Types::Strict::Integer.optional.default(nil)
+    attribute? :history_length, Types::Strict::Integer.optional
   end
 
-  # === A2A Request Interfaces ===
-  # (Requests remain the same, referencing corrected param types)
+  class TaskSendParams < BaseStruct
+    attribute :id, Types::Strict::String # Task ID
+    attribute :session_id, Types::Strict::String.default { SecureRandom.hex }
+    attribute :message, Message
+    attribute? :accepted_output_modes, Types::Strict::Array.of(Types::Strict::String).optional
+    attribute? :push_notification, PushNotificationConfig.optional
+    attribute? :history_length, Types::Strict::Integer.optional
+    attribute? :metadata, Types::Strict::Hash.optional
+  end
+
+  # --- Specific RPC Request/Response Types ---
 
   class SendTaskRequest < JSONRPCRequest
     attribute :method, Types::Strict::String.constrained(eql: 'tasks/send').default('tasks/send')
     attribute :params, TaskSendParams
   end
 
-  class GetTaskRequest < JSONRPCRequest
-    attribute :method, Types::Strict::String.constrained(eql: 'tasks/get').default('tasks/get')
-    attribute :params, TaskQueryParams
-  end
-
-  class CancelTaskRequest < JSONRPCRequest
-    attribute :method, Types::Strict::String.constrained(eql: 'tasks/cancel').default('tasks/cancel')
-    attribute :params, TaskIdParams
-  end
-
-  class SetTaskPushNotificationRequest < JSONRPCRequest
-    attribute :method, Types::Strict::String.constrained(eql: 'tasks/pushNotification/set').default('tasks/pushNotification/set')
-    attribute :params, TaskPushNotificationConfig
-  end
-
-  class GetTaskPushNotificationRequest < JSONRPCRequest
-    attribute :method, Types::Strict::String.constrained(eql: 'tasks/pushNotification/get').default('tasks/pushNotification/get')
-    attribute :params, TaskIdParams
-  end
-
-  class TaskResubscriptionRequest < JSONRPCRequest
-    attribute :method, Types::Strict::String.constrained(eql: 'tasks/resubscribe').default('tasks/resubscribe')
-    attribute :params, TaskQueryParams
+  class SendTaskResponse < JSONRPCResponse
+    attribute? :result, Task.optional
   end
 
   class SendTaskStreamingRequest < JSONRPCRequest
@@ -369,37 +278,110 @@ module A2A
     attribute :params, TaskSendParams
   end
 
-  # === A2A Response Interfaces ===
-  # (Responses remain the same, referencing corrected result/error types)
+  # Define the possible result types for streaming response
+  StreamingResult = Types::Instance(TaskStatusUpdateEvent) | Types::Instance(TaskArtifactUpdateEvent)
 
-  class SendTaskResponse < JSONRPCResponse
-    attribute? :result, Task.optional.default(nil)
-    attribute? :error, A2AError.optional.default(nil)
+  class SendTaskStreamingResponse < JSONRPCResponse
+    attribute? :result, (StreamingResult).optional
   end
 
-  StreamingResult = TaskStatusUpdateEvent | TaskArtifactUpdateEvent | Types::Strict::Nil
-  class SendTaskStreamingResponse < JSONRPCResponse
-    attribute? :result, StreamingResult
-    attribute? :error, A2AError.optional.default(nil)
+  class GetTaskRequest < JSONRPCRequest
+    attribute :method, Types::Strict::String.constrained(eql: 'tasks/get').default('tasks/get')
+    attribute :params, TaskQueryParams
   end
 
   class GetTaskResponse < JSONRPCResponse
-    attribute? :result, Task.optional.default(nil)
-    attribute? :error, A2AError.optional.default(nil)
+    attribute? :result, Task.optional
+  end
+
+  class CancelTaskRequest < JSONRPCRequest
+    attribute :method, Types::Strict::String.constrained(eql: 'tasks/cancel').default('tasks/cancel')
+    attribute :params, TaskIdParams
   end
 
   class CancelTaskResponse < JSONRPCResponse
-    attribute? :result, Task.optional.default(nil)
-    attribute? :error, A2AError.optional.default(nil)
+    attribute? :result, Task.optional
+  end
+
+  class SetTaskPushNotificationRequest < JSONRPCRequest
+    attribute :method, Types::Strict::String.constrained(eql: 'tasks/pushNotification/set').default('tasks/pushNotification/set')
+    attribute :params, TaskPushNotificationConfig
   end
 
   class SetTaskPushNotificationResponse < JSONRPCResponse
-    attribute? :result, TaskPushNotificationConfig.optional.default(nil)
-    attribute? :error, A2AError.optional.default(nil)
+    attribute? :result, TaskPushNotificationConfig.optional
+  end
+
+  class GetTaskPushNotificationRequest < JSONRPCRequest
+    attribute :method, Types::Strict::String.constrained(eql: 'tasks/pushNotification/get').default('tasks/pushNotification/get')
+    attribute :params, TaskIdParams
   end
 
   class GetTaskPushNotificationResponse < JSONRPCResponse
-    attribute? :result, TaskPushNotificationConfig.optional.default(nil)
-    attribute? :error, A2AError.optional.default(nil)
+    attribute? :result, TaskPushNotificationConfig.optional
   end
-end
+
+  class TaskResubscriptionRequest < JSONRPCRequest
+    attribute :method, Types::Strict::String.constrained(eql: 'tasks/resubscribe').default('tasks/resubscribe')
+    attribute :params, TaskIdParams # Or TaskQueryParams depending on spec interpretation
+  end
+
+  # --- Error Types (as Structs for consistency) ---
+
+  class JSONParseError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32700).default(-32700)
+    attribute :message, Types::Strict::String.constrained(eql: 'Invalid JSON payload').default('Invalid JSON payload')
+  end
+
+  class InvalidRequestError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32600).default(-32600)
+    attribute :message, Types::Strict::String.constrained(eql: 'Request payload validation error').default('Request payload validation error')
+  end
+
+  class MethodNotFoundError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32601).default(-32601)
+    attribute :message, Types::Strict::String.constrained(eql: 'Method not found').default('Method not found')
+    attribute? :data, Types::Nil
+  end
+
+  class InvalidParamsError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32602).default(-32602)
+    attribute :message, Types::Strict::String.constrained(eql: 'Invalid parameters').default('Invalid parameters')
+  end
+
+  class InternalError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32603).default(-32603)
+    attribute :message, Types::Strict::String.constrained(eql: 'Internal error').default('Internal error')
+  end
+
+  class TaskNotFoundError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32001).default(-32001)
+    attribute :message, Types::Strict::String.constrained(eql: 'Task not found').default('Task not found')
+    attribute? :data, Types::Nil
+  end
+
+  class TaskNotCancelableError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32002).default(-32002)
+    attribute :message, Types::Strict::String.constrained(eql: 'Task cannot be canceled').default('Task cannot be canceled')
+    attribute? :data, Types::Nil
+  end
+
+  class PushNotificationNotSupportedError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32003).default(-32003)
+    attribute :message, Types::Strict::String.constrained(eql: 'Push Notification is not supported').default('Push Notification is not supported')
+    attribute? :data, Types::Nil
+  end
+
+  class UnsupportedOperationError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32004).default(-32004)
+    attribute :message, Types::Strict::String.constrained(eql: 'This operation is not supported').default('This operation is not supported')
+    attribute? :data, Types::Nil
+  end
+
+  class ContentTypeNotSupportedError < JSONRPCError
+    attribute :code, Types::Strict::Integer.constrained(eql: -32005).default(-32005)
+    attribute :message, Types::Strict::String.constrained(eql: 'Incompatible content types').default('Incompatible content types')
+    attribute? :data, Types::Nil
+  end
+
+end # module A2A
