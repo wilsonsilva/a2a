@@ -1,0 +1,66 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.4
+  DisplayCopNames: true
+  NewCops: enable
+
+# ----------------------- Gemspec -----------------------
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+# ----------------------- Style -----------------------
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# ----------------------- Layout ----------------------
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - a2a.gemspec
+
+# ---------------------- Metrics ----------------------
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# ----------------------- RSpec -----------------------
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+# RuboCop does not like the gem's name.
+RSpec/SpecFilePathFormat:
+  Enabled: false
