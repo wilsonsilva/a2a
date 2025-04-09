@@ -182,7 +182,7 @@ module A2A
       response = nil
       begin
         # Make the POST request using the URL from the (potentially fetched) agent card
-        response = http_client.post(@url, json: request.to_json_hash)
+        response = http_client.post(@url, json: request.to_json)
 
         # Check initial response status
         unless response.status.success?
@@ -250,7 +250,7 @@ module A2A
       # Use standard headers for non-streaming requests
       http_client = HTTP.timeout(@options[:timeout]).headers(@options[:headers])
       # Send request body with camelCase keys using the URL from the agent card
-      response = http_client.post(@url, json: request.to_json_hash)
+      response = http_client.post(@url, json: request.to_json)
 
       unless response.status.success?
         raise HTTPError.new("HTTP Error: #{response.status.code} #{response.status.reason}", response.status.code, response.body.to_s)

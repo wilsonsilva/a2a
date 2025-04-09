@@ -86,7 +86,7 @@ module A2A
       begin
         puts @pastel.bright_black('Sending...')
 
-        @client.send_task_subscribe(params) do |event|
+        @client.send_task_streaming(params) do |event|
           print_agent_event(event)
         end
 
