@@ -1,0 +1,50 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.4
+  DisplayCopNames: true
+  NewCops: enable
+
+# ----------------------- Gemspec -----------------------
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+# ----------------------- Style -----------------------
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# ----------------------- Layout ----------------------
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - hsr.gemspec
+
+# ---------------------- Metrics ----------------------
+
+Metrics/BlockLength:
+  Exclude:
+    - '**/*_spec.rb'
+    - hsr.gemspec
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
+# ----------------------- RSpec -----------------------
+
+RSpec/ExampleLength:
+  Enabled: false
+
+# RuboCop does not like the gem's name.
+RSpec/SpecFilePathFormat:
+  Enabled: false

@@ -1,0 +1,3 @@
+module A2A
+  VERSION: String
+end

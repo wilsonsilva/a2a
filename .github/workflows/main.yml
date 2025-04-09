@@ -1,0 +1,72 @@
+name: Ruby
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Run RSpec with coverage
+        uses: paambaati/codeclimate-action@v9.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: bundle exec rspec
+
+  rubocop:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Run RuboCop
+        run: bundle exec rake rubocop
+
+  yard_junk:
+    runs-on: ubuntu-latest
+    name: Validate YARD documentation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Run yard:junk
+        run: bundle exec rake yard:junk
+
+  yardstick:
+    runs-on: ubuntu-latest
+    name: Measure YARD documentation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Run verify_measurements
+        run: bundle exec rake verify_measurements
+
+  bundle_audit:
+    runs-on: ubuntu-latest
+    name: Audit Bundle
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Run Bundle Audit
+        run: bundle exec rake bundle:audit
