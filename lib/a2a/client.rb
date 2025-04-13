@@ -124,6 +124,8 @@ module A2A
                                  params: params.to_h
                                })
 
+      Pastel.new.bright_green(JSON.parse(req.body)) # TODO
+
       Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https',
                       open_timeout: @timeout, read_timeout: @timeout) do |http|
         http.request(req) do |response|
