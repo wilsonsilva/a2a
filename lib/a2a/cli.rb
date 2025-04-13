@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'time'
 require 'securerandom'
-require 'base64'
-require 'uri'
-require 'rack'
+require 'time'
 require 'readline'
 require 'pastel'
-
+require 'json'
 require_relative '../a2a'
 
 module A2A
@@ -86,7 +82,7 @@ module A2A
       begin
         puts @pastel.bright_black('Sending...')
 
-        @client.send_task_streaming(params) do |event|
+        @client.send_task_subscribe(params) do |event|
           print_agent_event(event)
         end
 
@@ -208,3 +204,6 @@ module A2A
     end
   end
 end
+
+# Start the CLI if this file is being executed directly
+A2A::CLI.new.start if __FILE__ == $PROGRAM_NAME

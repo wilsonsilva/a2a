@@ -383,5 +383,4 @@ module A2A
     attribute :message, Types::Strict::String.constrained(eql: 'Incompatible content types').default('Incompatible content types')
     attribute? :data, Types::Nil
   end
-
-end # module A2A
+end
