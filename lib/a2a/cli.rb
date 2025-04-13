@@ -81,7 +81,7 @@ module A2A
 
       begin
         puts @pastel.bright_black('Sending...')
-        @pastel.bright_green(params.to_h) # TODO
+        puts @pastel.bright_green(params.to_h) # TODO
 
         @client.send_task_subscribe(params) do |event|
           print_agent_event(event)
@@ -89,6 +89,7 @@ module A2A
 
         puts @pastel.dim('--- End of response for this input ---')
       rescue StandardError => e
+        binding.irb
         print_error(e)
       end
     end
