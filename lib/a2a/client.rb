@@ -123,6 +123,7 @@ module A2A
                                  method: 'tasks/sendSubscribe',
                                  params: params.to_h
                                })
+      binding.irb
 
       Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https',
                       open_timeout: @timeout, read_timeout: @timeout) do |http|
