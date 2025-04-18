@@ -3,6 +3,10 @@
 
 require 'bundler/setup'
 require 'a2a'
+require 'factory_bot'
 require 'irb'
+
+FactoryBot.find_definitions
+include FactoryBot::Syntax::Methods
 
 IRB.start(__FILE__)

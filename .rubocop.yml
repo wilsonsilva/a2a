@@ -1,4 +1,5 @@
 plugins:
+  - rubocop-factory_bot
   - rubocop-performance
   - rubocop-rake
   - rubocop-rspec
@@ -14,6 +15,10 @@ Gemspec/DevelopmentDependencies:
   Enabled: false
 
 # ----------------------- Style -----------------------
+
+Style/MixinUsage:
+  Exclude:
+    - bin/console
 
 Style/StringLiterals:
   Enabled: true

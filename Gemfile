@@ -14,6 +14,7 @@ group :development do
   gem 'guard-rspec', '~> 4.7'
   gem 'guard-rubocop', '~> 1.5'
   gem 'irb', '~> 1.15.2'
+  gem 'match_json', '~> 0.0.9'
   gem 'overcommit', '~> 0.67'
   gem 'rake', '~> 13.2'
   gem 'rbs', '~> 3.8'

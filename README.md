@@ -21,7 +21,11 @@ An open protocol enabling communication and interoperability between opaque agen
 
 ## 🔑 Key features
 
-TODO
+- Protocol data structures defined according to the Agent2Agent specification
+- Serialization and deserialization of protocol messages
+- Typed data structures with validation
+- Case transformation support (snake_case ↔ camelCase) during instantiation and serialization
+- Flexible schema with support for additional properties beyond defined attributes
 
 ## 📦 Installation
 
@@ -31,7 +35,48 @@ Install the gem by executing:
 
 ## ⚡️ Quickstart
 
-TODO
+```ruby
+require 'a2a'
+
+# Create a task send parameters object
+task_params = A2A::TaskSendParams.new(
+  id: 'task-123',
+  session_id: 'session-456',
+  message: {
+    content: 'Plan a trip to Paris',
+    role: 'user'
+  }
+)
+
+# Build a JSON-RPC request object (no actual network request is made)
+request = A2A::SendTaskRequest.new(
+  id: 1,
+  params: task_params
+)
+
+# Convert to JSON with camelCase formatting (as per protocol spec)
+json_request = request.to_json
+puts json_request
+# => {"jsonrpc":"2.0","id":1,"method":"tasks/send","params":{"id":"task-123","sessionId":"session-456","message":{"content":"Plan a trip to Paris","role":"user"}}}
+
+# Parse a JSON response string
+agent_response = '{"jsonrpc":"2.0","id":1,"result":{"id":"task-123","status":"success","history":[{"role":"user","content":"Plan a trip to Paris"}]}}'
+
+# Method 1: Parse the JSON first, then create the object
+response_data = JSON.parse(agent_response)
+response = A2A::SendTaskResponse.new(response_data)
+
+# Method 2: Directly create the object from JSON (using the new from_json method)
+response = A2A::SendTaskResponse.from_json(agent_response)
+
+# Access the task information
+if response.result
+  puts "Task status: #{response.result.status}"
+  puts "Messages: #{response.result.history&.length || 0}"
+else
+  puts "Error: #{response.error&.message}"
+end
+```
 
 ## 📚 Documentation
 
