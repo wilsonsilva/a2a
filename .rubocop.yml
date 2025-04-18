@@ -32,7 +32,13 @@ Layout/LineLength:
 
 # ---------------------- Metrics ----------------------
 
+Metrics/AbcSize:
+  Enabled: false
+
 Metrics/BlockLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/ClassLength:
@@ -43,6 +49,9 @@ Metrics/MethodLength:
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
 
 # ----------------------- RSpec -----------------------
 
