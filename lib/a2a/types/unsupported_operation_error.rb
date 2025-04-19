@@ -10,6 +10,6 @@ module A2A
     attribute :message, Types::String.constant('This operation is not supported')
 
     # @return [nil] No additional data
-    attribute? :data, Types::Nil.default(nil)
+    attribute? :data, Types::Nil.constant(nil)
   end
 end
