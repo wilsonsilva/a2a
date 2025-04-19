@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'http'
 require 'dry/inflector'
 require 'zeitwerk'
 
@@ -13,6 +14,8 @@ end
 loader = Zeitwerk::Loader.for_gem
 loader.inflector.inflect(
   'a2a' => 'A2A',
+  'cli' => 'CLI',
+  'http' => 'HTTP',
   'json_deserialization' => 'JSONDeserialization',
   'jsonrpc_error' => 'JSONRPCError',
   'jsonrpc_message' => 'JSONRPCMessage',

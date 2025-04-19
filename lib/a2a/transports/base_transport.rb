@@ -1,0 +1,46 @@
+# frozen_string_literal: true
+
+module A2A
+  module Transports
+    # Base class for all A2A transports
+    # This defines the interface that all transports must implement
+    class BaseTransport
+      attr_reader :server, :logger
+
+      def initialize(server, logger: nil)
+        @server = server
+        @logger = logger || server.logger
+      end
+
+      # Start the transport
+      # This method should be implemented by subclasses
+      def start
+        raise NotImplementedError, "#{self.class} must implement #start"
+      end
+
+      # Stop the transport
+      # This method should be implemented by subclasses
+      def stop
+        raise NotImplementedError, "#{self.class} must implement #stop"
+      end
+
+      # Send a message to the client
+      # This method should be implemented by subclasses
+      def send_message(message)
+        raise NotImplementedError, "#{self.class} must implement #send_message"
+      end
+
+      # Send a Server-Sent Events (SSE) message
+      # This method should be implemented by subclasses that support streaming
+      def send_sse(message)
+        raise NotImplementedError, "#{self.class} must implement #send_sse for streaming"
+      end
+
+      # Process an incoming message
+      # This is a helper method that can be used by subclasses
+      def process_message(message)
+        server.handle_json_request(message)
+      end
+    end
+  end
+end

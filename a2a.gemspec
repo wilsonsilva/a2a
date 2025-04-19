@@ -31,5 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'dry-struct', '~> 1.8'
+  spec.add_dependency 'http', '~> 5.2'
+  spec.add_dependency 'pastel', '~> 0.8'
   spec.add_dependency 'zeitwerk', '~> 2.7'
 end
