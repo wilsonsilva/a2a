@@ -14,8 +14,8 @@ agent = A2A::Agent.build do
       state_transition_history false
     end
 
-    skill 'Route planning' do
-      id 'route-planner'
+    skill 'route-planner' do
+      name 'Route planning'
       description 'Helps plan routing between two locations'
       tags %w[maps routing navigation]
       examples ['plan my route from Sunnyvale to Mountain View']

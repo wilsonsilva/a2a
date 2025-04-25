@@ -32,5 +32,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'dry-struct', '~> 1.8'
   spec.add_dependency 'rack', '~> 3.1'
+  spec.add_dependency 'rackup', '~> 2.2'
+  spec.add_dependency 'webrick', '~> 1.9'
   spec.add_dependency 'zeitwerk', '~> 2.7'
 end
