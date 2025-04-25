@@ -42,40 +42,42 @@ The server must be compatible with the Rack specification to ensure it can be us
 require 'a2a'
 
 agent = A2A::Agent.build do
-  name "Echo Agent"
-  description "This agent echoes the input given"
-  url "http://localhost:9292/"
-  version "0.1.0"
+  card do
+    name "Echo Agent"
+    description "This agent echoes the input given"
+    url "http://localhost:9292/"
+    version "0.1.0"
 
-  capabilities do
-    streaming true
-    push_notifications false
-    state_transition_history false
-  end
+    capabilities do
+      streaming true
+      push_notifications false
+      state_transition_history false
+    end
 
-  default_input_modes ["text/plain"]
-  default_output_modes ["text/plain"]
+    default_input_modes ["text/plain"]
+    default_output_modes ["text/plain"]
 
-  skill "echo" do
-    name "Echo Tool"
-    description "Echoes the input given"
-    tags ["echo", "repeater"]
-    examples ["I will see this echoed back to me"]
-  end
+    skill "echo" do
+      name "Echo Tool"
+      description "Echoes the input given"
+      tags ["echo", "repeater"]
+      examples ["I will see this echoed back to me"]
+    end
 
-  # Task handlers
-  on_task do |task|
-    # Handle incoming tasks
-    text = task.message.parts.first.text
-    task.complete("You said: #{text}")
-  end
+    # Task handlers
+    on_task do |task|
+      # Handle incoming tasks
+      text = task.message.parts.first.text
+      task.complete("You said: #{text}")
+    end
 
-  on_task_subscribe do |task, stream|
-    # Handle streaming task
-    text = task.message.parts.first.text
-    stream.send_update("Processing: #{text}", state: "working")
-    sleep 1
-    stream.send_update("Finished processing!", state: "completed", final: true)
+    on_task_subscribe do |task, stream|
+      # Handle streaming task
+      text = task.message.parts.first.text
+      stream.send_update("Processing: #{text}", state: "working")
+      sleep 1
+      stream.send_update("Finished processing!", state: "completed", final: true)
+    end
   end
 end
 
@@ -130,47 +132,49 @@ The server must provide a DSL for defining agent cards and skills:
 
 ```ruby
 A2A::Agent.build do
-  name "My Agent"
-  description "A useful agent for demonstration"
-  url "https://my-agent.example.com"
-  version "1.0.0"
+  card do
+    name "My Agent"
+    description "A useful agent for demonstration"
+    url "https://my-agent.example.com"
+    version "1.0.0"
 
-  provider do
-    organization "Example, Inc."
-    url "https://example.com"
-  end
+    provider do
+      organization "Example, Inc."
+      url "https://example.com"
+    end
 
-  documentation_url "https://docs.example.com/my-agent"
+    documentation_url "https://docs.example.com/my-agent"
 
-  capabilities do
-    streaming true
-    push_notifications true
-    state_transition_history true
-  end
+    capabilities do
+      streaming true
+      push_notifications true
+      state_transition_history true
+    end
 
-  authentication do
-    schemes ["bearer"]
-  end
+    authentication do
+      schemes ["bearer"]
+    end
 
-  default_input_modes ["text/plain", "application/json"]
-  default_output_modes ["text/plain", "application/json"]
+    default_input_modes ["text/plain", "application/json"]
+    default_output_modes ["text/plain", "application/json"]
 
-  skill "analysis" do
-    id "data-analysis"  # optional, defaults to name as snake_case
-    description "Analyzes data and provides insights"
-    tags ["data", "analysis", "insights"]
-    examples [
-      "Analyze this CSV file",
-      "Find patterns in this dataset"
-    ]
-    # Override the modes for this specific skill
-    input_modes ["text/plain", "text/csv", "application/json"]
-    output_modes ["text/plain", "application/json", "image/png"]
-  end
+    skill "analysis" do
+      id "data-analysis"  # optional, defaults to name as snake_case
+      description "Analyzes data and provides insights"
+      tags ["data", "analysis", "insights"]
+      examples [
+                 "Analyze this CSV file",
+                 "Find patterns in this dataset"
+               ]
+      # Override the modes for this specific skill
+      input_modes ["text/plain", "text/csv", "application/json"]
+      output_modes ["text/plain", "application/json", "image/png"]
+    end
 
-  # Additional skills...
-  skill "summarize" do
-    # ...
+    # Additional skills...
+    skill "summarize" do
+      # ...
+    end
   end
 end
 ```
