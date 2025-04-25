@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'json'
-require_relative 'types'
-
 module A2A
   # Agent class responsible for defining and managing agent behavior and metadata
   class Agent
     # @return [AgentCard] The agent's metadata card
-    attr_reader :card
+    # attr_reader :card
 
     # Creates a new agent instance with the specified card
     #
@@ -38,6 +35,7 @@ module A2A
     #   agent = A2A::Agent.define do
     #     card 'path/to/agent_card.json'
     #   end
+    #
     def self.define(&block)
       new.tap do |agent|
         agent.instance_eval(&block) if block_given?
@@ -49,15 +47,19 @@ module A2A
     # @param arg [AgentCard, String, nil] The agent card, path to a JSON file, or nil if using block
     # @param block [Proc] Block containing the card definition if arg is nil
     # @return [AgentCard] The agent card instance
+    #
+    # @raise [AgentCardFileNotFoundError] If the provided card file path does not exist
+    #
     def card(arg = nil, &block)
       @card = if arg.is_a?(AgentCard)
-                # Option 2: AgentCard instance
                 arg
-              elsif arg.is_a?(String) && File.exist?(arg)
-                # Option 3: Card from JSON file
-                AgentCard.from_json(File.read(arg))
+              elsif arg.is_a?(String)
+                if File.exist?(arg)
+                  AgentCard.from_json(File.read(arg))
+                else
+                  raise AgentCardFileNotFoundError, arg
+                end
               elsif block_given?
-                # Option 1: Card from DSL
                 CardBuilder.build(&block)
               else
                 @card
@@ -210,6 +212,13 @@ module A2A
         def respond_to_missing?(method_name, include_private = false)
           true
         end
+      end
+    end
+
+    # Error raised when an agent card file is not found
+    class AgentCardFileNotFoundError < StandardError
+      def initialize(agent_card_path)
+        super("Agent card file not found: #{agent_card_path}")
       end
     end
   end

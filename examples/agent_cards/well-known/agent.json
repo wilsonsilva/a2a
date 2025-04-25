@@ -1,0 +1,41 @@
+{
+  "name": "Google Maps Agent",
+  "description": "Plan routes, remember places, and generate directions",
+  "url": "https://maps-agent.google.com",
+  "provider": {
+    "organization": "Google",
+    "url": "https://google.com"
+  },
+  "version": "1.0.0",
+  "documentation_url": "https://example.com/docs",
+  "capabilities": {
+    "streaming": false,
+    "push_notifications": false,
+    "state_transition_history": false
+  },
+  "authentication": {
+    "schemes": ["OAuth2"]
+  },
+  "default_input_modes": ["text/plain"],
+  "default_output_modes": ["text/plain", "application/html"],
+  "skills": [
+    {
+      "id": "route-planner",
+      "name": "Route planning",
+      "description": "Helps plan routing between two locations",
+      "tags": ["maps", "routing", "navigation"],
+      "examples": ["plan my route from Sunnyvale to Mountain View"],
+      "input_modes": ["text/plain"],
+      "output_modes": ["application/html", "video/mp4"]
+    },
+    {
+      "id": "custom-map",
+      "name": "My Map",
+      "description": "Manage a custom map with your own saved places",
+      "tags": ["custom-map", "saved-places"],
+      "examples": ["show me my favorite restaurants on the map"],
+      "input_modes": ["text/plain"],
+      "output_modes": ["application/html"]
+    }
+  ]
+}
