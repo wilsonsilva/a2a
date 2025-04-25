@@ -21,5 +21,46 @@ module A2A
 
     # @return [Hash, nil] Optional metadata associated with the task.
     attribute? :metadata, Types::Hash.optional
+
+    def submitted?
+      status.state == 'submitted'
+    end
+
+    def working?
+      status.state == 'working'
+    end
+
+    def input_required?
+      status.state == 'input-required'
+    end
+
+    def completed?
+      status.state == 'completed'
+    end
+
+    def canceled?
+      status.state == 'canceled'
+    end
+
+    def failed?
+      status.state == 'failed'
+    end
+
+    def unknown?
+      status.state == 'unknown'
+    end
+
+    def cancelable?
+      submitted? || working?
+    end
+
+    def cancel(reason)
+      message = Message.new(parts: [TextPart.new(text: reason)], role: 'agent')
+      copy(status: status.copy(state: 'canceled', message:))
+    end
+
+    def add_artifact(artifact)
+      copy(artifacts: artifacts.to_a.dup.push(artifact))
+    end
   end
 end
