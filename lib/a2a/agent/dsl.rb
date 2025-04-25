@@ -72,14 +72,12 @@ module A2A
         # Initialize with empty attributes hash
         def initialize
           @attributes = {}
-          @skills = []
         end
 
         # Convert the builder to an AgentCard instance
         #
         # @return [AgentCard] The agent card instance
         def to_card
-          @attributes[:skills] = @skills unless @skills.empty?
           AgentCard.new(@attributes)
         end
 
@@ -102,10 +100,7 @@ module A2A
           when :authentication
             @attributes[:authentication] = AuthenticationBuilder.build(&block)
           when :skill
-            skill_builder = SkillBuilder.new
-            skill_builder.id(args.first) if args.first.is_a?(String)
-            skill_builder.instance_eval(&block)
-            @skills << skill_builder.to_skill
+            @attributes[:skills] = SkillBuilder.build(args.first, &block)
           end
         end
 
@@ -187,12 +182,12 @@ module A2A
 
         # Skill Builder class
         class SkillBuilder
-          def self.build(&block)
-            new.tap { |builder| builder.instance_eval(&block) }.to_skill
+          def self.build(id, &block)
+            new(id).tap { |builder| builder.instance_eval(&block) }.to_skill
           end
 
-          def initialize
-            @attributes = {}
+          def initialize(id)
+            @attributes = { id: }
           end
 
           def to_skill
