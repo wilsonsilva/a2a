@@ -9,7 +9,6 @@ agent = A2A::Agent.build do
   # on_task TaskManager
   # on_task_subscribe AsyncTaskManager
 
-  # Hook for logging
   before_task do |task|
     puts "Task received: #{task.id}"
   end

@@ -24,17 +24,17 @@ agent = A2A::Agent.build do
     end
   end
 
+  # Using task managers
   # on_task TaskManager
   # on_task_subscribe AsyncTaskManager
 
-  # Hook for logging
   before_task do |task|
     puts "Task received: #{task.id}"
   end
 
-  # on_task_transition do |task, task_state|
-  #
-  # end
+  on_task_transition do |task, previous_state, current_state|
+    puts "Task #{task.id} transitioned from #{previous_state} to #{current_state}"
+  end
 
   after_task do |task|
     puts "Task completed: #{task.id}"
@@ -43,14 +43,22 @@ agent = A2A::Agent.build do
   on_task do |task|
     # Handle incoming tasks
     text = task.message.parts.first.text
-    task.complete("You said: #{text}")
+    puts "You said: #{text}"
+    # task.complete("You said: #{text}")
   end
 
-  on_task_subscribe do |task, stream|
-    # Handle streaming task
-    text = task.message.parts.first.text
-    stream.send_update("Processing: #{text}", state: "working")
-    sleep 1
-    stream.send_update("Finished processing!", state: "completed", final: true)
-  end
+  # on_task_subscribe do |task, stream|
+  #   # Handle streaming task
+  #   text = task.message.parts.first.text
+  #   stream.send_update("Processing: #{text}", state: "working")
+  #   sleep 1
+  #   stream.send_update("Finished processing!", state: "completed", final: true)
+  # end
 end
+
+# Create a Rack application
+app = A2A::Transport.new(agent)
+
+# Run with Rack
+use Rack::Logger
+run app
