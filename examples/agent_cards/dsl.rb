@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'a2a'
+require_relative '../../lib/a2a'
 
 agent = A2A::Agent.build do
   card do
@@ -29,8 +29,9 @@ agent = A2A::Agent.build do
     default_input_modes ['text/plain']
     default_output_modes %w[text/plain application/html]
 
-    skill 'Route planning' do
+    skill do
       id 'route-planner'
+      name 'Route planning'
       description 'Helps plan routing between two locations'
       tags %w[maps routing navigation]
       examples ['plan my route from Sunnyvale to Mountain View']
@@ -38,8 +39,9 @@ agent = A2A::Agent.build do
       output_modes %w[application/html video/mp4]
     end
 
-    skill 'Place Reminder' do
+    skill do
       id 'place-reminder'
+      name 'Place Reminder'
       description 'Reminds you of places you want to remember'
       tags %w[maps reminder location]
       examples ['remind me of the coffee shop in Mountain View']
@@ -48,3 +50,5 @@ agent = A2A::Agent.build do
     end
   end
 end
+
+pp agent.card.to_h

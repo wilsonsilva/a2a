@@ -27,7 +27,7 @@ module A2A
       #     card 'path/to/agent_card.json'
       #   end
       #
-      def self.define(&block)
+      def self.build(&block)
         Agent.new.tap do |agent|
           agent.instance_eval(&block) if block_given?
         end
