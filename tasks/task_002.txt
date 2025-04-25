@@ -1,6 +1,6 @@
 # Task ID: 2
 # Title: Implement data structure classes for A2A protocol
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Create the dry-struct based classes that represent A2A protocol data structures.

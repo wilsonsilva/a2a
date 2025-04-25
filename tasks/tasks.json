@@ -4,7 +4,7 @@
       "id": 1,
       "title": "Set up project structure and dependencies",
       "description": "Initialize the gem structure, define dependencies, and set up the basic module hierarchy.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
       "priority": "high",
       "details": "Create the gem skeleton using `bundle gem a2a`. Configure gemspec with dependencies including dry-struct for data models and rack for HTTP compatibility. Set up the directory structure as specified in the PRD. Create the main module file with version information. Set up RSpec for testing. Initialize Git repository with appropriate .gitignore.",
@@ -14,7 +14,7 @@
       "id": 2,
       "title": "Implement data structure classes for A2A protocol",
       "description": "Create the dry-struct based classes that represent A2A protocol data structures.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         1
       ],
@@ -26,7 +26,7 @@
       "id": 3,
       "title": "Implement Agent builder DSL",
       "description": "Create the DSL for defining A2A agents with configuration options and event hooks.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         2
       ],
@@ -43,7 +43,7 @@
         2
       ],
       "priority": "high",
-      "details": "Implement A2A::TaskManager with methods for creating, retrieving, updating, and transitioning tasks. Use thread-safe in-memory storage with a mutex for concurrent access. Implement task state transitions with proper validation. Add methods for task cancellation and completion. Include support for task history tracking when enabled.",
+      "details": "Implement A2A::TaskManager with methods for creating, retrieving, updating, and transitioning tasks. Use thread-safe in-memory storage with a mutex for concurrent access. Implement task state transitions with proper validation. Add methods for task cancellation and completion. Include support for task history tracking when enabled. Note that tasks are immutable dry-structs.",
       "testStrategy": "Test task creation, retrieval, and updates. Verify state transitions work correctly and invalid transitions are rejected. Test concurrent access to ensure thread safety. Verify task history is properly maintained when enabled."
     },
     {

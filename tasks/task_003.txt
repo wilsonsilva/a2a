@@ -1,6 +1,6 @@
 # Task ID: 3
 # Title: Implement Agent builder DSL
-# Status: pending
+# Status: done
 # Dependencies: 2
 # Priority: high
 # Description: Create the DSL for defining A2A agents with configuration options and event hooks.
