@@ -86,14 +86,14 @@ module A2A
         # Handle method calls for card attributes
         def method_missing(method_name, *args, &block)
           if block_given? && %i[provider capabilities authentication skill].include?(method_name)
-            handle_nested_attribute(method_name, &block)
+            handle_nested_attribute(method_name, *args, &block)
           else
             @attributes[method_name] = args.first
           end
         end
 
         # Handle nested attributes that require their own builders
-        def handle_nested_attribute(attr_name, &block)
+        def handle_nested_attribute(attr_name, *args, &block)
           case attr_name
           when :provider
             @attributes[:provider] = ProviderBuilder.build(&block)
@@ -102,7 +102,10 @@ module A2A
           when :authentication
             @attributes[:authentication] = AuthenticationBuilder.build(&block)
           when :skill
-            @skills << SkillBuilder.build(&block)
+            skill_builder = SkillBuilder.new
+            skill_builder.name(args.first) if args.first.is_a?(String)
+            skill_builder.instance_eval(&block)
+            @skills << skill_builder.to_skill
           end
         end
 
