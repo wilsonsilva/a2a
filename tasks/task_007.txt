@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Implement streaming support via SSE
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Add support for streaming responses using Server-Sent Events.
+# Details:
+Implement the tasks/sendSubscribe JSON-RPC method in the Transport layer. Create a streaming response handler that uses Rack's streaming API. Implement the SSE protocol for sending incremental updates. Create a Stream class that task handlers can use to send updates. Implement the process_streaming_task method in A2A::Agent.
+
+# Test Strategy:
+Test streaming responses using a mock HTTP client that supports SSE. Verify that incremental updates are sent correctly. Test reconnection handling. Verify that the final update is sent when the task completes.

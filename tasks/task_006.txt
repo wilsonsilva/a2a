@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Implement task processing pipeline
+# Status: pending
+# Dependencies: 5
+# Priority: high
+# Description: Connect the Agent, TaskManager, and Transport components to process tasks end-to-end.
+# Details:
+Implement the process_task method in A2A::Agent to handle the full task lifecycle. Connect the Transport layer's JSON-RPC handlers to the Agent's task processing methods. Ensure hooks are called at appropriate points in the lifecycle. Implement proper error handling and response generation.
+
+# Test Strategy:
+Create end-to-end tests that submit tasks through the Transport layer and verify they are processed correctly. Test that hooks are called in the correct order. Verify error conditions are handled properly.

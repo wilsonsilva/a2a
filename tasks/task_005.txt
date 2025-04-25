@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Implement Transport layer for HTTP handling
+# Status: pending
+# Dependencies: 3, 4
+# Priority: high
+# Description: Create the Rack-compatible application that handles A2A protocol HTTP endpoints.
+# Details:
+Implement A2A::Transport as a Rack application that handles requests to /.well-known/agent.json and /jsonrpc endpoints. Create handlers for all JSON-RPC methods: tasks/send, tasks/get, tasks/cancel. Implement proper request validation and error handling. Ensure responses follow the JSON-RPC 2.0 specification.
+
+# Test Strategy:
+Write integration tests using Rack::Test to verify endpoint behavior. Test agent card retrieval, task submission, task retrieval, and task cancellation. Verify error handling for invalid requests and server errors.

@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Create documentation and examples
+# Status: pending
+# Dependencies: 9
+# Priority: low
+# Description: Develop comprehensive documentation and example implementations.
+# Details:
+Create a README with installation and basic usage instructions. Write YARD documentation for all public classes and methods. Create a Getting Started guide. Develop examples for different use cases: echo agent, LLM-powered agent, tool-using agent, etc. Include the example from the PRD as a working implementation. Create a guide for A2A protocol concepts.
+
+# Test Strategy:
+Verify that all examples run without errors. Ensure documentation is complete for all public APIs. Test documentation examples as part of the test suite to ensure they remain valid.

@@ -1,0 +1,130 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Set up project structure and dependencies",
+      "description": "Initialize the gem structure, define dependencies, and set up the basic module hierarchy.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Create the gem skeleton using `bundle gem a2a`. Configure gemspec with dependencies including dry-struct for data models and rack for HTTP compatibility. Set up the directory structure as specified in the PRD. Create the main module file with version information. Set up RSpec for testing. Initialize Git repository with appropriate .gitignore.",
+      "testStrategy": "Verify that the gem can be required without errors. Ensure all dependencies are correctly specified and can be installed. Run basic smoke tests to confirm module loading."
+    },
+    {
+      "id": 2,
+      "title": "Implement data structure classes for A2A protocol",
+      "description": "Create the dry-struct based classes that represent A2A protocol data structures.",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "Implement the following classes in the types/ directory using dry-struct: AgentCard, AgentProvider, AgentCapabilities, AgentSkill, Task, TaskStatus, Message, Part, Artifact, and PushNotificationConfig. Each class should match the A2A protocol specification with proper attribute types and validations. Include JSON serialization/deserialization capabilities.",
+      "testStrategy": "Write unit tests for each data structure class. Verify that instances can be created with valid attributes, serialized to JSON, and deserialized from JSON. Test validation behavior with invalid inputs."
+    },
+    {
+      "id": 3,
+      "title": "Implement Agent builder DSL",
+      "description": "Create the DSL for defining A2A agents with configuration options and event hooks.",
+      "status": "pending",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Implement the A2A::Agent class with the builder pattern. Create methods for defining the agent card, capabilities, and skills. Implement hook registration methods (before_task, on_task_transition, after_task). Add handler registration methods (on_task, on_task_subscribe). Create a CardBuilder class to support the nested DSL for agent card definition.",
+      "testStrategy": "Write tests that verify the DSL can be used to define agents with various configurations. Test that hooks and handlers are properly registered and can be accessed. Verify that the resulting agent card matches the specification."
+    },
+    {
+      "id": 4,
+      "title": "Implement TaskManager for task lifecycle",
+      "description": "Create the TaskManager class to handle task storage, retrieval, and state transitions.",
+      "status": "pending",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Implement A2A::TaskManager with methods for creating, retrieving, updating, and transitioning tasks. Use thread-safe in-memory storage with a mutex for concurrent access. Implement task state transitions with proper validation. Add methods for task cancellation and completion. Include support for task history tracking when enabled.",
+      "testStrategy": "Test task creation, retrieval, and updates. Verify state transitions work correctly and invalid transitions are rejected. Test concurrent access to ensure thread safety. Verify task history is properly maintained when enabled."
+    },
+    {
+      "id": 5,
+      "title": "Implement Transport layer for HTTP handling",
+      "description": "Create the Rack-compatible application that handles A2A protocol HTTP endpoints.",
+      "status": "pending",
+      "dependencies": [
+        3,
+        4
+      ],
+      "priority": "high",
+      "details": "Implement A2A::Transport as a Rack application that handles requests to /.well-known/agent.json and /jsonrpc endpoints. Create handlers for all JSON-RPC methods: tasks/send, tasks/get, tasks/cancel. Implement proper request validation and error handling. Ensure responses follow the JSON-RPC 2.0 specification.",
+      "testStrategy": "Write integration tests using Rack::Test to verify endpoint behavior. Test agent card retrieval, task submission, task retrieval, and task cancellation. Verify error handling for invalid requests and server errors."
+    },
+    {
+      "id": 6,
+      "title": "Implement task processing pipeline",
+      "description": "Connect the Agent, TaskManager, and Transport components to process tasks end-to-end.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "high",
+      "details": "Implement the process_task method in A2A::Agent to handle the full task lifecycle. Connect the Transport layer's JSON-RPC handlers to the Agent's task processing methods. Ensure hooks are called at appropriate points in the lifecycle. Implement proper error handling and response generation.",
+      "testStrategy": "Create end-to-end tests that submit tasks through the Transport layer and verify they are processed correctly. Test that hooks are called in the correct order. Verify error conditions are handled properly."
+    },
+    {
+      "id": 7,
+      "title": "Implement streaming support via SSE",
+      "description": "Add support for streaming responses using Server-Sent Events.",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "Implement the tasks/sendSubscribe JSON-RPC method in the Transport layer. Create a streaming response handler that uses Rack's streaming API. Implement the SSE protocol for sending incremental updates. Create a Stream class that task handlers can use to send updates. Implement the process_streaming_task method in A2A::Agent.",
+      "testStrategy": "Test streaming responses using a mock HTTP client that supports SSE. Verify that incremental updates are sent correctly. Test reconnection handling. Verify that the final update is sent when the task completes."
+    },
+    {
+      "id": 8,
+      "title": "Implement push notification support",
+      "description": "Add support for sending push notifications to external endpoints.",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "Implement the tasks/pushNotification/set and tasks/pushNotification/get JSON-RPC methods. Create a PushNotificationManager class to store and manage notification configurations. Implement secure notification delivery using HTTP POST requests. Add retry logic for failed notifications. Integrate with the task lifecycle to trigger notifications on state changes.",
+      "testStrategy": "Test push notification configuration and retrieval. Use webmock to test notification delivery to external endpoints. Verify retry behavior for failed notifications. Test that notifications are triggered on appropriate state changes."
+    },
+    {
+      "id": 9,
+      "title": "Implement configuration and advanced features",
+      "description": "Add global configuration options and implement advanced features like task persistence and authentication.",
+      "status": "pending",
+      "dependencies": [
+        7,
+        8
+      ],
+      "priority": "medium",
+      "details": "Create A2A.configure method for global configuration. Implement task persistence interfaces and the Redis backend. Add authentication support in the Transport layer. Implement error handling hooks. Create interfaces for custom task stores. Add task cleanup and expiration functionality.",
+      "testStrategy": "Test configuration options and verify they affect behavior as expected. Test task persistence with both in-memory and Redis backends. Test authentication with various schemes. Verify error handling hooks are called appropriately."
+    },
+    {
+      "id": 10,
+      "title": "Create documentation and examples",
+      "description": "Develop comprehensive documentation and example implementations.",
+      "status": "pending",
+      "dependencies": [
+        9
+      ],
+      "priority": "low",
+      "details": "Create a README with installation and basic usage instructions. Write YARD documentation for all public classes and methods. Create a Getting Started guide. Develop examples for different use cases: echo agent, LLM-powered agent, tool-using agent, etc. Include the example from the PRD as a working implementation. Create a guide for A2A protocol concepts.",
+      "testStrategy": "Verify that all examples run without errors. Ensure documentation is complete for all public APIs. Test documentation examples as part of the test suite to ensure they remain valid."
+    }
+  ],
+  "metadata": {
+    "projectName": "PRD Implementation",
+    "totalTasks": 10,
+    "sourceFile": "latest-prd.md",
+    "generatedAt": "2023-06-15"
+  }
+}

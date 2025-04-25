@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Implement push notification support
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Add support for sending push notifications to external endpoints.
+# Details:
+Implement the tasks/pushNotification/set and tasks/pushNotification/get JSON-RPC methods. Create a PushNotificationManager class to store and manage notification configurations. Implement secure notification delivery using HTTP POST requests. Add retry logic for failed notifications. Integrate with the task lifecycle to trigger notifications on state changes.
+
+# Test Strategy:
+Test push notification configuration and retrieval. Use webmock to test notification delivery to external endpoints. Verify retry behavior for failed notifications. Test that notifications are triggered on appropriate state changes.

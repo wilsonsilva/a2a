@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Implement data structure classes for A2A protocol
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Create the dry-struct based classes that represent A2A protocol data structures.
+# Details:
+Implement the following classes in the types/ directory using dry-struct: AgentCard, AgentProvider, AgentCapabilities, AgentSkill, Task, TaskStatus, Message, Part, Artifact, and PushNotificationConfig. Each class should match the A2A protocol specification with proper attribute types and validations. Include JSON serialization/deserialization capabilities.
+
+# Test Strategy:
+Write unit tests for each data structure class. Verify that instances can be created with valid attributes, serialized to JSON, and deserialized from JSON. Test validation behavior with invalid inputs.

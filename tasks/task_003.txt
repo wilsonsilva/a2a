@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Implement Agent builder DSL
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create the DSL for defining A2A agents with configuration options and event hooks.
+# Details:
+Implement the A2A::Agent class with the builder pattern. Create methods for defining the agent card, capabilities, and skills. Implement hook registration methods (before_task, on_task_transition, after_task). Add handler registration methods (on_task, on_task_subscribe). Create a CardBuilder class to support the nested DSL for agent card definition.
+
+# Test Strategy:
+Write tests that verify the DSL can be used to define agents with various configurations. Test that hooks and handlers are properly registered and can be accessed. Verify that the resulting agent card matches the specification.
