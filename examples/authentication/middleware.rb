@@ -2,7 +2,7 @@
 
 require 'a2a'
 
-agent = A2A::Agent.define do
+agent = A2A::Agent.build do
   card do
     name 'Google Maps Agent'
     url 'https://maps-agent.google.com'

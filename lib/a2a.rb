@@ -13,6 +13,7 @@ end
 loader = Zeitwerk::Loader.for_gem
 loader.inflector.inflect(
   'a2a' => 'A2A',
+  'dsl' => 'DSL',
   'json_deserialization' => 'JSONDeserialization',
   'jsonrpc_error' => 'JSONRPCError',
   'jsonrpc_message' => 'JSONRPCMessage',

@@ -2,7 +2,7 @@
 
 require 'a2a'
 
-agent = A2A::Agent.define do
+agent = A2A::Agent.build do
   card A2A::AgentCard.new(
     name: 'Google Maps Agent',
     description: 'Plan routes, remember places, and generate directions',

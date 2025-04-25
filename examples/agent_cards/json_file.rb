@@ -2,7 +2,7 @@
 
 require_relative '../../lib/a2a'
 
-agent = A2A::Agent.define do
+agent = A2A::Agent.build do
   card File.join(File.dirname(__FILE__), 'well-known/agent.json')
 end
 

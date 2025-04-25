@@ -2,7 +2,7 @@
 
 require 'a2a'
 
-agent = A2A::Agent.define do
+agent = A2A::Agent.build do
   card 'well-known/agent.json'
 
   # Using task managers
@@ -25,7 +25,8 @@ agent = A2A::Agent.define do
   on_task do |task|
     # Handle incoming tasks
     text = task.message.parts.first.text
-    task.complete("You said: #{text}")
+    puts "You said: #{text}"
+    # task.complete("You said: #{text}")
   end
 
   # on_task_subscribe do |task, stream|
