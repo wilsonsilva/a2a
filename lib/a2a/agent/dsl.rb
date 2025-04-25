@@ -62,21 +62,23 @@ module A2A
         # Builds an AgentCard from the DSL block
         #
         # @param block [Proc] Block containing the card definition
+        #
         # @return [AgentCard] The built agent card
+        #
         def self.build(&block)
           new.tap do |builder|
             builder.instance_eval(&block)
           end.to_card
         end
 
-        # Initialize with empty attributes hash
         def initialize
-          @attributes = {}
+          @attributes = { skills: [] }
         end
 
         # Convert the builder to an AgentCard instance
         #
         # @return [AgentCard] The agent card instance
+        #
         def to_card
           AgentCard.new(@attributes)
         end
@@ -94,13 +96,13 @@ module A2A
         def handle_nested_attribute(attr_name, *args, &block)
           case attr_name
           when :provider
-            @attributes[:provider] = ProviderBuilder.build(&block)
+            @attributes[:provider] = AnonymousBuilder.build(AgentProvider, &block)
           when :capabilities
-            @attributes[:capabilities] = CapabilitiesBuilder.build(&block)
+            @attributes[:capabilities] = AnonymousBuilder.build(AgentCapabilities, &block)
           when :authentication
-            @attributes[:authentication] = AuthenticationBuilder.build(&block)
+            @attributes[:authentication] = AnonymousBuilder.build(AgentAuthentication, &block)
           when :skill
-            @attributes[:skills] = SkillBuilder.build(args.first, &block)
+            @attributes[:skills] << NamedBuilder.build(AgentSkill, args.first, &block)
           end
         end
 
@@ -109,20 +111,18 @@ module A2A
           true
         end
 
-        # Helper classes for nested attributes
-
-        # Provider Builder class
-        class ProviderBuilder
-          def self.build(&block)
-            new.tap { |builder| builder.instance_eval(&block) }.to_provider
+        class AnonymousBuilder
+          def self.build(klass, &block)
+            new(klass).tap { |builder| builder.instance_eval(&block) }.finalize
           end
 
-          def initialize
+          def initialize(klass)
+            @klass = klass
             @attributes = {}
           end
 
-          def to_provider
-            AgentProvider.new(@attributes)
+          def finalize
+            @klass.new(@attributes)
           end
 
           def method_missing(method_name, *args)
@@ -134,64 +134,18 @@ module A2A
           end
         end
 
-        # Capabilities Builder class
-        class CapabilitiesBuilder
-          def self.build(&block)
-            new.tap { |builder| builder.instance_eval(&block) }.to_capabilities
+        class NamedBuilder
+          def self.build(klass, id, &block)
+            new(klass, id).tap { |builder| builder.instance_eval(&block) }.finalize
           end
 
-          def initialize
-            @attributes = {}
-          end
-
-          def to_capabilities
-            AgentCapabilities.new(@attributes)
-          end
-
-          def method_missing(method_name, *args)
-            @attributes[method_name] = args.first
-          end
-
-          def respond_to_missing?(method_name, include_private = false)
-            true
-          end
-        end
-
-        # Authentication Builder class
-        class AuthenticationBuilder
-          def self.build(&block)
-            new.tap { |builder| builder.instance_eval(&block) }.to_authentication
-          end
-
-          def initialize
-            @attributes = {}
-          end
-
-          def to_authentication
-            AgentAuthentication.new(@attributes)
-          end
-
-          def method_missing(method_name, *args)
-            @attributes[method_name] = args.first
-          end
-
-          def respond_to_missing?(method_name, include_private = false)
-            true
-          end
-        end
-
-        # Skill Builder class
-        class SkillBuilder
-          def self.build(id, &block)
-            new(id).tap { |builder| builder.instance_eval(&block) }.to_skill
-          end
-
-          def initialize(id)
+          def initialize(klass, id)
+            @klass = klass
             @attributes = { id: }
           end
 
-          def to_skill
-            AgentSkill.new(@attributes)
+          def finalize
+            @klass.new(@attributes)
           end
 
           def method_missing(method_name, *args)
