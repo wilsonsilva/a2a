@@ -103,7 +103,7 @@ module A2A
             @attributes[:authentication] = AuthenticationBuilder.build(&block)
           when :skill
             skill_builder = SkillBuilder.new
-            skill_builder.name(args.first) if args.first.is_a?(String)
+            skill_builder.id(args.first) if args.first.is_a?(String)
             skill_builder.instance_eval(&block)
             @skills << skill_builder.to_skill
           end

@@ -41,39 +41,39 @@ The server must be compatible with the Rack specification to ensure it can be us
 # Example usage with Rack
 require 'a2a'
 
-agent = A2A::Server.define do
+agent = A2A::Agent.build do
   name "Echo Agent"
   description "This agent echoes the input given"
   url "http://localhost:9292/"
   version "0.1.0"
-  
+
   capabilities do
     streaming true
     push_notifications false
     state_transition_history false
   end
-  
+
   default_input_modes ["text/plain"]
   default_output_modes ["text/plain"]
-  
+
   skill "echo" do
     name "Echo Tool"
     description "Echoes the input given"
     tags ["echo", "repeater"]
     examples ["I will see this echoed back to me"]
   end
-  
+
   # Task handlers
   on_task do |task|
     # Handle incoming tasks
     text = task.message.parts.first.text
     task.complete("You said: #{text}")
   end
-  
+
   on_task_subscribe do |task, stream|
     # Handle streaming task
     text = task.message.parts.first.text
-    stream.send_update("Processing: #{text}", state: "working") 
+    stream.send_update("Processing: #{text}", state: "working")
     sleep 1
     stream.send_update("Finished processing!", state: "completed", final: true)
   end
@@ -100,7 +100,7 @@ end
 # Sinatra integration
 class MyApp < Sinatra::Base
   register A2A::Sinatra
-  
+
   a2a_agent do
     name "My Sinatra Agent"
     # ...
@@ -110,12 +110,12 @@ end
 # Roda integration
 class MyApp < Roda
   plugin :a2a
-  
+
   a2a_agent do
     name "My Roda Agent"
     # ...
   end
-  
+
   route do |r|
     r.a2a
   end
@@ -129,35 +129,34 @@ end
 The server must provide a DSL for defining agent cards and skills:
 
 ```ruby
-A2A::Server.define do
+A2A::Agent.build do
   name "My Agent"
   description "A useful agent for demonstration"
   url "https://my-agent.example.com"
   version "1.0.0"
-  
+
   provider do
     organization "Example, Inc."
     url "https://example.com"
   end
-  
+
   documentation_url "https://docs.example.com/my-agent"
-  
+
   capabilities do
     streaming true
     push_notifications true
     state_transition_history true
   end
-  
+
   authentication do
     schemes ["bearer"]
   end
-  
+
   default_input_modes ["text/plain", "application/json"]
   default_output_modes ["text/plain", "application/json"]
-  
+
   skill "analysis" do
     id "data-analysis"  # optional, defaults to name as snake_case
-    name "Data Analysis"
     description "Analyzes data and provides insights"
     tags ["data", "analysis", "insights"]
     examples [
@@ -168,7 +167,7 @@ A2A::Server.define do
     input_modes ["text/plain", "text/csv", "application/json"]
     output_modes ["text/plain", "application/json", "image/png"]
   end
-  
+
   # Additional skills...
   skill "summarize" do
     # ...
@@ -185,7 +184,7 @@ Implement a task management system that handles:
 on_task do |task|
   # process the task
   user_message = task.message.parts.first.text
-  
+
   # Create an artifact response
   task.complete("Here's my response to: #{user_message}")
 end
@@ -197,19 +196,19 @@ on_task TaskHandler.new
 on_task_subscribe do |task, stream|
   # Send stream updates
   stream.send_status_update("working", "Processing your request...")
-  
+
   # Do some work
   result = process_task(task)
-  
+
   # Send artifact updates
   stream.send_artifact_update(result, append: false, last_chunk: false)
-  
+
   # More processing
   additional_result = process_more(task)
-  
+
   # Send more artifact data
   stream.send_artifact_update(additional_result, append: true, last_chunk: true)
-  
+
   # Complete the task
   stream.send_status_update("completed", "Task is finished", final: true)
 end
@@ -240,38 +239,38 @@ module A2A
       def initialize(options = {})
         # Initialize storage with options
       end
-      
+
       def create_task(id, session_id, message, metadata = {})
         # Create a new task
         raise NotImplementedError
       end
-      
+
       def update_task(id, updates)
         # Update an existing task
         raise NotImplementedError
       end
-      
+
       def get_task(id)
         # Retrieve a task
         raise NotImplementedError
       end
-      
+
       def list_tasks(filters = {})
         # List tasks with optional filters
         raise NotImplementedError
       end
-      
+
       def delete_task(id)
         # Delete a task
         raise NotImplementedError
       end
     end
-    
+
     # Built-in storage options
     class InMemory < Base
       # Implement methods with in-memory data structures
     end
-    
+
     class Redis < Base
       # Implement methods with Redis
     end
@@ -287,11 +286,11 @@ class A2A::Task
   def working(message = nil)
     update_status("working", message)
   end
-  
+
   def require_input(message)
     update_status("input-required", message)
   end
-  
+
   def complete(message = nil, artifacts = nil)
     if artifacts
       add_artifacts(artifacts)
@@ -300,24 +299,24 @@ class A2A::Task
     end
     update_status("completed", message)
   end
-  
+
   def cancel(message = nil)
     update_status("canceled", message)
   end
-  
+
   def fail(message)
     update_status("failed", message)
   end
-  
+
   # Artifact management
   def add_artifact(artifact)
     # Add a single artifact
   end
-  
+
   def add_artifacts(artifacts)
     # Add multiple artifacts
   end
-  
+
   def add_artifact_from_message(message)
     # Convenience method to create an artifact from a message
   end
@@ -335,47 +334,47 @@ module A2A
       @task = task
       @subscribers = []
     end
-    
+
     def add_subscriber(subscriber)
       @subscribers << subscriber
     end
-    
+
     def remove_subscriber(subscriber)
       @subscribers.delete(subscriber)
     end
-    
+
     def send_status_update(state, message = nil, final: false)
       update = build_status_update(state, message, final)
       broadcast(update)
     end
-    
+
     def send_artifact_update(content, append: false, last_chunk: false)
       update = build_artifact_update(content, append, last_chunk)
       broadcast(update)
     end
-    
+
     private
-    
+
     def broadcast(update)
       @subscribers.each do |subscriber|
         subscriber.send_event(update)
       end
     end
-    
+
     def build_status_update(state, message, final)
       # Build status update object
     end
-    
+
     def build_artifact_update(content, append, last_chunk)
       # Build artifact update object
     end
   end
-  
+
   class SSESubscriber
     def initialize(response)
       @response = response
     end
-    
+
     def send_event(data)
       # Format data as an SSE event and send it to the response
       event_data = JSON.generate(data)
@@ -396,11 +395,11 @@ module A2A
     class Rack
       # Implement SSE for Rack
     end
-    
+
     class Puma
       # Implement SSE for Puma
     end
-    
+
     class Unicorn
       # Implement SSE for Unicorn
     end
@@ -417,12 +416,12 @@ module A2A
   module Errors
     class Base < StandardError
       attr_reader :code, :data
-      
+
       def initialize(message, data = nil)
         super(message)
         @data = data
       end
-      
+
       def to_json_rpc
         {
           code: code,
@@ -431,48 +430,48 @@ module A2A
         }
       end
     end
-    
+
     class JSONParse < Base
       def code; -32700; end
     end
-    
+
     class InvalidRequest < Base
       def code; -32600; end
     end
-    
+
     class MethodNotFound < Base
       def code; -32601; end
     end
-    
+
     class InvalidParams < Base
       def code; -32602; end
     end
-    
+
     class Internal < Base
       def code; -32603; end
     end
-    
+
     class TaskNotFound < Base
       def code; -32001; end
     end
-    
+
     class TaskCannotBeCanceled < Base
       def code; -32002; end
     end
-    
+
     class PushNotificationsNotSupported < Base
       def code; -32003; end
     end
-    
+
     class UnsupportedOperation < Base
       def code; -32004; end
     end
-    
+
     class IncompatibleContentTypes < Base
       def code; -32005; end
     end
   end
-  
+
   class ErrorHandler
     def self.handle(request, error)
       # Map Ruby exceptions to A2A error responses
@@ -480,7 +479,7 @@ module A2A
         jsonrpc: "2.0",
         id: request.id
       }
-      
+
       case error
       when Errors::Base
         response[:error] = error.to_json_rpc
@@ -489,7 +488,7 @@ module A2A
       else
         response[:error] = Errors::Internal.new("Internal error").to_json_rpc
       end
-      
+
       response
     end
   end
@@ -506,26 +505,26 @@ module A2A
     def initialize(agent)
       @agent = agent
     end
-    
+
     def register(task_id, config)
       # Register push notification configuration for a task
     end
-    
+
     def unregister(task_id)
       # Unregister push notifications for a task
     end
-    
+
     def get_config(task_id)
       # Get push notification configuration for a task
     end
-    
+
     def send_notification(task_id, payload)
       config = get_config(task_id)
       return unless config
-      
+
       # Send push notification to the configured URL
       client = HTTP.headers("Content-Type" => "application/json")
-      
+
       # Add authentication if specified
       if config.authentication
         case config.authentication.schemes.first
@@ -536,13 +535,13 @@ module A2A
           client = client.headers("Authorization" => "Bearer #{generate_jwt(task_id, config)}")
         end
       end
-      
+
       # Send the notification
       client.post(config.url, json: payload)
     end
-    
+
     private
-    
+
     def generate_jwt(task_id, config)
       # Generate a JWT for authentication
     end
@@ -560,33 +559,33 @@ module A2A
     def initialize(app)
       @app = app
     end
-    
+
     def call(env)
       # Process the request before passing it to the app
       @app.call(env)
       # Process the response
     end
   end
-  
+
   class Server
     def use(middleware, *args, &block)
       # Add middleware to the server
       @middlewares << [middleware, args, block]
     end
-    
+
     # Hooks for various events
     def before_task(&block)
       @before_task_hooks << block
     end
-    
+
     def after_task(&block)
       @after_task_hooks << block
     end
-    
+
     def before_send(&block)
       @before_send_hooks << block
     end
-    
+
     def after_send(&block)
       @after_send_hooks << block
     end
@@ -648,30 +647,30 @@ end
 # Complete agent definition example
 require 'a2a'
 
-agent = A2A::Server.define do
+agent = A2A::Agent.build do
   name "Content Assistant"
   description "AI assistant for content creation and editing"
   url "https://content-assistant.example.com"
   version "1.0.0"
-  
+
   provider do
     organization "Example, Inc."
     url "https://example.com"
   end
-  
+
   capabilities do
     streaming true
     push_notifications true
     state_transition_history true
   end
-  
+
   authentication do
     schemes ["bearer"]
   end
-  
+
   default_input_modes ["text/plain", "application/json"]
   default_output_modes ["text/plain", "application/json"]
-  
+
   skill "write" do
     name "Content Writing"
     description "Write new content based on instructions"
@@ -681,7 +680,7 @@ agent = A2A::Server.define do
       "Create a product description for a new smartphone"
     ]
   end
-  
+
   skill "edit" do
     name "Content Editing"
     description "Edit and improve existing content"
@@ -691,12 +690,12 @@ agent = A2A::Server.define do
       "Proofread this document"
     ]
   end
-  
+
   # Use middleware for authentication
   use A2A::Middleware::Authentication do |request, env|
     # Verify bearer token
     token = env['HTTP_AUTHORIZATION']&.gsub('Bearer ', '')
-    
+
     # Use your authentication logic here
     if token == 'valid-token'
       true
@@ -704,13 +703,13 @@ agent = A2A::Server.define do
       raise A2A::Errors::InvalidRequest.new("Invalid authentication")
     end
   end
-  
+
   # Hook for logging
   before_task do |task|
     # Log task details
     puts "Task received: #{task.id}"
   end
-  
+
   # Task handlers
   on_task do |task|
     case task.skill_id
@@ -722,12 +721,12 @@ agent = A2A::Server.define do
       task.fail("Unsupported skill")
     end
   end
-  
+
   on_task_subscribe do |task, stream|
     skill_id = task.skill_id
-    
+
     stream.send_status_update("working", "Processing your request")
-    
+
     # Stream chunks of content
     if skill_id == "write"
       stream_writing_process(task, stream)
@@ -737,7 +736,7 @@ agent = A2A::Server.define do
       stream.send_status_update("failed", "Unsupported skill", final: true)
     end
   end
-  
+
   # Define helper methods for use in handlers
   helper do
     def write_content(task)
@@ -746,33 +745,33 @@ agent = A2A::Server.define do
       result = "Here's your new content based on: #{input}"
       task.complete(result)
     end
-    
+
     def edit_content(task)
       input = task.message.parts.first.text
       # Edit the provided content
       result = "Here's your edited content: #{input.upcase}"
       task.complete(result)
     end
-    
+
     def stream_writing_process(task, stream)
       input = task.message.parts.first.text
-      
+
       # Stream parts of the content
       intro = "Introduction based on: #{input}"
       body = "Main content expanding on the topic."
       conclusion = "Conclusion summarizing key points."
-      
+
       stream.send_artifact_update(intro, append: false, last_chunk: false)
       sleep 1 # Simulate processing time
-      
+
       stream.send_artifact_update(body, append: true, last_chunk: false)
       sleep 1
-      
+
       stream.send_artifact_update(conclusion, append: true, last_chunk: true)
-      
+
       stream.send_status_update("completed", "Writing complete", final: true)
     end
-    
+
     def stream_editing_process(task, stream)
       # Similar implementation for editing
     end

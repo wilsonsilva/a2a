@@ -29,8 +29,8 @@ agent = A2A::Agent.build do
     default_input_modes ['text/plain']
     default_output_modes %w[text/plain application/html]
 
-    skill 'Route planning' do
-      id 'route-planner'
+    skill 'route-planner' do
+      name 'Route planning'
       description 'Helps plan routing between two locations'
       tags %w[maps routing navigation]
       examples ['plan my route from Sunnyvale to Mountain View']
@@ -38,8 +38,8 @@ agent = A2A::Agent.build do
       output_modes %w[application/html video/mp4]
     end
 
-    skill 'Place Reminder' do
-      id 'place-reminder'
+    skill 'place-reminder' do
+      name 'Place Reminder'
       description 'Reminds you of places you want to remember'
       tags %w[maps reminder location]
       examples ['remind me of the coffee shop in Mountain View']
