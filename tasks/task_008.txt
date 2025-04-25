@@ -1,6 +1,6 @@
 # Task ID: 8
 # Title: Implement push notification support
-# Status: pending
+# Status: done
 # Dependencies: 6
 # Priority: medium
 # Description: Add support for sending push notifications to external endpoints.

@@ -38,7 +38,7 @@
       "id": 4,
       "title": "Implement TaskManager for task lifecycle",
       "description": "Create the TaskManager class to handle task storage, retrieval, and state transitions.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         2
       ],
@@ -50,7 +50,7 @@
       "id": 5,
       "title": "Implement Transport layer for HTTP handling",
       "description": "Create the Rack-compatible application that handles A2A protocol HTTP endpoints.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         3,
         4
@@ -63,7 +63,7 @@
       "id": 6,
       "title": "Implement task processing pipeline",
       "description": "Connect the Agent, TaskManager, and Transport components to process tasks end-to-end.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         5
       ],
@@ -75,7 +75,7 @@
       "id": 7,
       "title": "Implement streaming support via SSE",
       "description": "Add support for streaming responses using Server-Sent Events.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         6
       ],
@@ -87,7 +87,7 @@
       "id": 8,
       "title": "Implement push notification support",
       "description": "Add support for sending push notifications to external endpoints.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         6
       ],
@@ -99,7 +99,7 @@
       "id": 9,
       "title": "Implement configuration and advanced features",
       "description": "Add global configuration options and implement advanced features like task persistence and authentication.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         7,
         8

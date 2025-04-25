@@ -1,6 +1,6 @@
 # Task ID: 7
 # Title: Implement streaming support via SSE
-# Status: pending
+# Status: done
 # Dependencies: 6
 # Priority: medium
 # Description: Add support for streaming responses using Server-Sent Events.

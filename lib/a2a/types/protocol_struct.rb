@@ -8,5 +8,6 @@ module A2A
   class ProtocolStruct < Dry::Struct
     include Extensions::CaseTransformation
     include Extensions::JSONDeserialization
+    include Extensions::Copying
   end
 end

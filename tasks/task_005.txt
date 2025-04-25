@@ -1,6 +1,6 @@
 # Task ID: 5
 # Title: Implement Transport layer for HTTP handling
-# Status: pending
+# Status: done
 # Dependencies: 3, 4
 # Priority: high
 # Description: Create the Rack-compatible application that handles A2A protocol HTTP endpoints.

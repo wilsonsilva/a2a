@@ -1,11 +1,11 @@
 # Task ID: 4
 # Title: Implement TaskManager for task lifecycle
-# Status: pending
+# Status: done
 # Dependencies: 2
 # Priority: high
 # Description: Create the TaskManager class to handle task storage, retrieval, and state transitions.
 # Details:
-Implement A2A::TaskManager with methods for creating, retrieving, updating, and transitioning tasks. Use thread-safe in-memory storage with a mutex for concurrent access. Implement task state transitions with proper validation. Add methods for task cancellation and completion. Include support for task history tracking when enabled.
+Implement A2A::TaskManager with methods for creating, retrieving, updating, and transitioning tasks. Use thread-safe in-memory storage with a mutex for concurrent access. Implement task state transitions with proper validation. Add methods for task cancellation and completion. Include support for task history tracking when enabled. Note that tasks are immutable dry-structs.
 
 # Test Strategy:
 Test task creation, retrieval, and updates. Verify state transitions work correctly and invalid transitions are rejected. Test concurrent access to ensure thread safety. Verify task history is properly maintained when enabled.
