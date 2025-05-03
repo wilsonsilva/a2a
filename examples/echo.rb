@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
-require 'a2a'
+require_relative '../lib/a2a'
 require 'rack'
-require 'rackup'
+require 'rackup/handler/webrick'
+require 'logger'
+
+# Create a logger for the agent
+logger = Logger.new($stdout)
+logger.level = Logger::INFO
 
 # Create a basic echo agent
 echo_agent = A2A::Agent.build do
@@ -30,17 +35,17 @@ echo_agent = A2A::Agent.build do
 
   # Log when tasks are received
   before_task do |task|
-    puts "Received task: #{task.id}"
+    logger.info("Received task: #{task.id}")
   end
 
   # Log state transitions
   on_task_transition do |task, from, to|
-    puts "Task #{task.id} state changed: #{from || 'new'} -> #{to}"
+    logger.info("Task #{task.id} state changed: #{from || 'new'} -> #{to}")
   end
 
   # Log when tasks are completed
   after_task do |task|
-    puts "Task completed: #{task.id}"
+    logger.info("Task completed: #{task.id}")
   end
 
   # This is where the actual work happens
@@ -52,6 +57,7 @@ echo_agent = A2A::Agent.build do
       if part.type == 'text'
         input_text = part.text
         echo_text = "Echo: #{input_text}"
+        logger.info("Echoing: #{input_text}")
 
         # Create a response artifact
         part = A2A::TextPart.new(
@@ -73,13 +79,21 @@ echo_agent = A2A::Agent.build do
           metadata: {}
         )
 
-        # Update task with response
-        task.with_artifacts([artifact])
-          .with_status(A2A::TaskStatus.new(
-            state: 'completed',
-            message: message,
-            timestamp: Time.now.iso8601
-          ))
+        # Create a task status
+        status = A2A::TaskStatus.new(
+          state: 'completed',
+          message: message,
+          timestamp: Time.now.iso8601
+        )
+
+        # Return updated task - Note: immutable objects pattern
+        task = task.copy(
+          artifacts: [artifact],
+          status: status
+        )
+
+        logger.debug("Returning task with #{task.artifacts.size} artifacts")
+        task
       else
         # Create an error response for non-text input
         message = A2A::Message.new(
@@ -92,11 +106,14 @@ echo_agent = A2A::Agent.build do
           metadata: {}
         )
 
-        task.with_status(A2A::TaskStatus.new(
+        status = A2A::TaskStatus.new(
           state: 'failed',
           message: message,
           timestamp: Time.now.iso8601
-        ))
+        )
+
+        logger.warn("Received non-text message: #{part.type}")
+        task.copy(status: status)
       end
     else
       # Create an error response for empty message
@@ -110,23 +127,47 @@ echo_agent = A2A::Agent.build do
         metadata: {}
       )
 
-      task.with_status(A2A::TaskStatus.new(
+      status = A2A::TaskStatus.new(
         state: 'failed',
         message: message,
         timestamp: Time.now.iso8601
-      ))
+      )
+
+      logger.warn("Received empty message")
+      task.copy(status: status)
     end
+  end
+
+  # Handle errors
+  on_error do |task, error|
+    logger.error("Error processing task #{task.id}: #{error.message}")
+    logger.error(error.backtrace.join("\n"))
   end
 end
 
 # Create a Rack application
-app = A2A::Transport.new(echo_agent)
+app = A2A::Transport.new(echo_agent, logger: logger)
 
 # Run with Rackup when this file is executed directly
 if __FILE__ == $0
-  # A simple Rack handler to run the app
-  Rackup::Handler::WEBrick.run(app, Port: 9292) do |server|
-    puts "Echo Agent is running at http://localhost:9292"
-    puts "Press Ctrl+C to stop"
+  logger.info("Starting Echo Agent server...")
+
+  # Set up signal handling for graceful shutdown
+  trap('INT') do
+    logger.info("Shutting down...")
+    exit
   end
+
+  # Start the server with Rack 3.1 compatible handler
+  options = {
+    Port: 3000,
+    Host: 'localhost',
+    Logger: logger,
+    AccessLog: []
+  }
+
+  logger.info("Echo Agent is running at http://localhost:9292")
+  logger.info("Press Ctrl+C to stop")
+
+  Rackup::Handler::WEBrick.run(app, **options)
 end

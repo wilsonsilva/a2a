@@ -54,13 +54,33 @@ module A2A
       submitted? || working?
     end
 
+    def terminal?
+      completed? || canceled? || failed?
+    end
+
     def cancel(reason)
       message = Message.new(parts: [TextPart.new(text: reason)], role: 'agent')
       copy(status: status.copy(state: 'canceled', message:))
     end
 
-    def add_artifact(artifact)
+    def with_artifact(artifact)
       copy(artifacts: artifacts.to_a.dup.push(artifact))
+    end
+
+    def with_artifacts(artifacts)
+      copy(artifacts: self.artifacts.to_a.dup.push(*artifacts))
+    end
+
+    def with_session_id(session_id)
+      copy(session_id:)
+    end
+
+    def with_status(status)
+      copy(status:)
+    end
+
+    def with_message(message)
+      copy(status: status.copy(message:))
     end
   end
 end

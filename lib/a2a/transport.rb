@@ -82,7 +82,7 @@ module A2A
 
     def handle_jsonrpc(request)
       # Ensure content type is JSON
-      unless request.content_type == CONTENT_TYPE_JSON
+      unless request.content_type.include?(CONTENT_TYPE_JSON)
         return jsonrpc_error_response(nil, -32600, 'Request payload validation error', 'Content-Type must be application/json')
       end
 
@@ -141,8 +141,8 @@ module A2A
 
         # Return response
         jsonrpc_success_response(id, result.to_h)
-      rescue => e
-        jsonrpc_error_response(id, -32603, 'Internal error', e.message)
+      # rescue => e
+      #   jsonrpc_error_response(id, -32603, 'Internal error', e.message)
       end
     end
 
@@ -239,71 +239,6 @@ module A2A
       # Implementation would continue with SSE streaming setup for existing task
       # This is a placeholder for the actual streaming implementation
       jsonrpc_error_response(id, -32004, 'Unsupported operation', 'Streaming is not fully implemented')
-    end
-
-    # Handle tasks/pushNotification/set method
-    def handle_set_push_notification(id, params)
-      # Check if agent supports push notifications
-      unless @agent.card.capabilities&.push_notifications
-        return jsonrpc_error_response(id, -32003, 'Push notifications not supported',
-                                      'This agent does not support push notifications')
-      end
-
-      task_id = params['id']
-      push_config = params['pushNotificationConfig']
-
-      unless task_id && push_config
-        return jsonrpc_error_response(id, -32602, 'Invalid parameters',
-                                      'Task ID and push notification config are required')
-      end
-
-      begin
-        task = @agent.get_task(task_id)
-
-        if task.nil?
-          return jsonrpc_error_response(id, -32001, 'Task not found',
-                                        "Task with ID #{task_id} not found")
-        end
-
-        result = @agent.set_push_notification(task_id, push_config)
-        jsonrpc_success_response(id, result.to_h)
-      rescue => e
-        jsonrpc_error_response(id, -32603, 'Internal error', e.message)
-      end
-    end
-
-    # Handle tasks/pushNotification/get method
-    def handle_get_push_notification(id, params)
-      # Check if agent supports push notifications
-      unless @agent.card.capabilities&.push_notifications
-        return jsonrpc_error_response(id, -32003, 'Push notifications not supported',
-                                      'This agent does not support push notifications')
-      end
-
-      task_id = params['id']
-
-      unless task_id
-        return jsonrpc_error_response(id, -32602, 'Invalid parameters', 'Task ID is required')
-      end
-
-      begin
-        task = @agent.get_task(task_id)
-
-        if task.nil?
-          return jsonrpc_error_response(id, -32001, 'Task not found', "Task with ID #{task_id} not found")
-        end
-
-        config = @agent.get_push_notification(task_id)
-
-        if config.nil?
-          return jsonrpc_error_response(id, -32001, 'Push notification config not found',
-                                        "No push notification config for task ID #{task_id}")
-        end
-
-        jsonrpc_success_response(id, config.to_h)
-      rescue => e
-        jsonrpc_error_response(id, -32603, 'Internal error', e.message)
-      end
     end
 
     # Helper methods for JSON-RPC responses

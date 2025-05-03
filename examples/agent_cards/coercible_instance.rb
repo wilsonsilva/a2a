@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require 'a2a'
+# a2a/examples/agent_cards/coercible_instance.rb
+
+require '../lib/a2a'
 
 agent = A2A::Agent.build do
   card A2A::AgentCard.new(

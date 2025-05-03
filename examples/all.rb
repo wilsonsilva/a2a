@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require 'a2a'
+# a2a/examples/all.rb
+
+require '../lib/a2a'
 
 agent = A2A::Agent.build do
   card do
