@@ -4,7 +4,10 @@ module A2A
   # Request to cancel a currently running task.
   class CancelTaskRequest < JSONRPCRequest
     # @return [String] Method name for canceling a task.
-    attribute :method, Types::String.constant('tasks/cancel')
+    METHOD = 'tasks/cancel'
+
+    # @return [String] Method name for canceling a task.
+    attribute :method, Types::String.constant(METHOD)
 
     # @return [TaskIdParams] Parameters for the cancel task method.
     attribute :params, Types::Constructor(TaskIdParams)

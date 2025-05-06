@@ -4,7 +4,10 @@ module A2A
   # Request to send a message/initiate a task.
   class SendTaskRequest < JSONRPCRequest
     # @return [String] Method name for sending a task message.
-    attribute :method, Types::String.constant('tasks/send')
+    METHOD = 'tasks/send'
+
+    # @return [String] Method name for sending a task message.
+    attribute :method, Types::String.constant(METHOD)
 
     # @return [TaskSendParams] Parameters for the send task method.
     attribute :params, Types::Constructor(TaskSendParams)
