@@ -1,0 +1,11 @@
+{
+  "enableAllProjectMcpServers": false,
+  "permissions": {
+    "allow": [
+      "Bash(./bin/console)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "WebFetchTool(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
