@@ -9,11 +9,13 @@ preserving major version constraints. Only update MAJOR.MINOR versions, never PA
 
 Steps:
 1. Read the Gemfile at the specified path (or ./Gemfile if $ARGUMENTS is empty)
-2. Run `bundle outdated --only-explicit` to check for available minor updates of explicitly declared gems
-3. Update gem version constraints to allow latest minor versions only (MAJOR.MINOR format)
-4. Use pessimistic version constraints (~> MAJOR.MINOR) to prevent automatic patch updates
-5. Preserve any existing version operators but ensure they follow minor-only update strategy
-6. Run `bundle update` to apply the changes
+2. Read the corresponding Gemfile.lock to get current resolved versions
+3. Run `bundle outdated --only-explicit` to check for available minor updates of explicitly declared gems
+4. For each gem in Gemfile, check if Gemfile.lock has a newer minor version than the current Gemfile constraint allows
+5. Update gem version constraints to match the minor version from Gemfile.lock or latest available, whichever is newer (MAJOR.MINOR format)
+6. Use pessimistic version constraints (~> MAJOR.MINOR) to prevent automatic patch updates
+7. Preserve any existing version operators but ensure they follow minor-only update strategy
+8. Run `bundle update` to apply the changes
 7. If --commit flag is provided:
    8. Stage Gemfile
    9. Verify if Gemfile.lock is tracked. If tracked, stage it for commit.
