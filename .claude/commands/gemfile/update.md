@@ -17,8 +17,8 @@ Steps:
 7. Preserve any existing version operators but ensure they follow minor-only update strategy
 8. Run `bundle update` to apply the changes
 7. If --commit flag is provided:
-   8. Stage Gemfile
-   9. Verify if Gemfile.lock is tracked. If tracked, stage it for commit.
+   8. Stage Gemfile (only if not gitignored)
+   9. Verify if Gemfile.lock is tracked and not gitignored. If both conditions are met, stage it for commit.
    10. Create a git commit with message 'Update development dependencies' and a description listing all updated gems with their old and new versions like:
        ```
        Updated gems:
