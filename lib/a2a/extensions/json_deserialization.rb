@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'json'
-
 module A2A
   module Extensions
     # Provides JSON deserialization capabilities to a class
@@ -45,7 +43,7 @@ module A2A
         #   agent_card = A2A::AgentCard.from_json(json_string)
         #
         def from_json(json)
-          new(JSON.parse(json))
+          new(MultiJson.load(json, symbolize_keys: true))
         end
       end
     end
