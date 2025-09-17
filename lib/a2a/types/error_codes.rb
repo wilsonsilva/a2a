@@ -22,5 +22,11 @@ module A2A
     PUSH_NOTIFICATION_NOT_SUPPORTED = -32_003
     # The requested operation is not supported by the agent
     UNSUPPORTED_OPERATION = -32_004
+    # Content type is not supported
+    CONTENT_TYPE_NOT_SUPPORTED = -32_005
+    # Invalid agent response type
+    INVALID_AGENT_RESPONSE = -32_006
+    # Authenticated Extended Card not configured
+    AUTHENTICATED_EXTENDED_CARD_NOT_CONFIGURED = -32_007
   end
 end
