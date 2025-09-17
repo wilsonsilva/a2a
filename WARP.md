@@ -65,6 +65,12 @@ bundle exec rake build
 bundle exec rake release
 ```
 
+### Claude AI Commands
+```bash
+# Update Gemfile dependencies with commit
+claude --print --verbose "/gemfile:update --commit"
+```
+
 ## Architecture Overview
 
 ### Core Structure
