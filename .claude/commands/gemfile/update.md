@@ -20,11 +20,26 @@ Steps:
 8. Stage Gemfile (only if not gitignored)
 9. Verify if Gemfile.lock is tracked and not gitignored. If both conditions are met, stage it for commit.
 10. Create a git commit with message 'Update development dependencies' and a description listing all updated gems with their old and new versions like:
+
 <commit-message>
   Updated gems:
 - rubocop: 1.75.2 → 1.78.0
 - rubocop-yard: 0.10.0 → 1.0.0
 </commit-message>
+
+11. If any dependencies were updated, respond only with the update message. And if the user has chose to commit,
+include the update commit message. Otherwise, respond only with the no op message.
+
+<update-message>
+Updated gems:
+- rbs: 3.8 → 3.9
+- rubocop: 1.78 → 1.80
+- rubocop-rspec: 3.6 → 3.7
+
+<update-commit-message>The changes have been committed with the message "Update development dependencies".</update-commit-message>
+</update-message>
+
+<no-op-message>All dependencies are up to date.</no-op-message>
 
 Key bundle outdated flags used:
 - `--only-explicit`: Only show gems explicitly listed in Gemfile (not dependencies)
