@@ -16,15 +16,15 @@ Steps:
 6. Use pessimistic version constraints (~> MAJOR.MINOR) to prevent automatic patch updates
 7. Preserve any existing version operators but ensure they follow minor-only update strategy
 8. Run `bundle update` to apply the changes
-7. If --commit flag is provided:
-   8. Stage Gemfile (only if not gitignored)
-   9. Verify if Gemfile.lock is tracked and not gitignored. If both conditions are met, stage it for commit.
-   10. Create a git commit with message 'Update development dependencies' and a description listing all updated gems with their old and new versions like:
-       ```
-       Updated gems:
-       - rubocop: 1.75.2 → 1.78.0
-       - rubocop-yard: 0.10.0 → 1.0.0
-       ```
+7. Skip step 8, 9 and 10 if --commit flag is not provided
+8. Stage Gemfile (only if not gitignored)
+9. Verify if Gemfile.lock is tracked and not gitignored. If both conditions are met, stage it for commit.
+10. Create a git commit with message 'Update development dependencies' and a description listing all updated gems with their old and new versions like:
+<commit-message>
+  Updated gems:
+- rubocop: 1.75.2 → 1.78.0
+- rubocop-yard: 0.10.0 → 1.0.0
+</commit-message>
 
 Key bundle outdated flags used:
 - `--only-explicit`: Only show gems explicitly listed in Gemfile (not dependencies)
