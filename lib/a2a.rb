@@ -2,6 +2,7 @@
 
 require 'dry/inflector'
 require 'zeitwerk'
+require 'jsonrpc'
 
 # Encapsulates all the gem's logic
 module A2A
@@ -13,12 +14,7 @@ end
 loader = Zeitwerk::Loader.for_gem
 loader.inflector.inflect(
   'a2a' => 'A2A',
-  'json_deserialization' => 'JSONDeserialization',
-  'jsonrpc_error' => 'JSONRPCError',
-  'jsonrpc_message' => 'JSONRPCMessage',
-  'jsonrpc_request' => 'JSONRPCRequest',
-  'jsonrpc_response' => 'JSONRPCResponse',
-  'json_parse_error' => 'JSONParseError'
+  'json_deserialization' => 'JSONDeserialization'
 )
 loader.collapse("#{__dir__}/a2a/types")
 loader.enable_reloading

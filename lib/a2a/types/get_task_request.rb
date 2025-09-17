@@ -2,7 +2,7 @@
 
 module A2A
   # Request to retrieve the current state of a task.
-  class GetTaskRequest < JSONRPCRequest
+  class GetTaskRequest < JSONRPC::Request
     # @return [String] Method name for getting task status.
     METHOD = 'tasks/get'
 

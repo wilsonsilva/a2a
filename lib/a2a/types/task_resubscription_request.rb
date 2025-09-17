@@ -2,7 +2,7 @@
 
 module A2A
   # Request to resubscribe to updates for a task after a connection interruption.
-  class TaskResubscriptionRequest < JSONRPCRequest
+  class TaskResubscriptionRequest < JSONRPC::Request
     # @return [String] Method name for resubscribing to task updates.
     METHOD = 'tasks/resubscribe'
 

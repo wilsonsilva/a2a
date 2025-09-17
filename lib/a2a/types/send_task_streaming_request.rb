@@ -2,7 +2,7 @@
 
 module A2A
   # Request to send a message/initiate a task and subscribe to streaming updates.
-  class SendTaskStreamingRequest < JSONRPCRequest
+  class SendTaskStreamingRequest < JSONRPC::Request
     # @return [String] Method name for sending a task message and subscribing to updates.
     METHOD = 'tasks/sendSubscribe'
 

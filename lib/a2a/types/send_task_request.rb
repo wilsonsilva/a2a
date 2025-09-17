@@ -2,7 +2,7 @@
 
 module A2A
   # Request to send a message/initiate a task.
-  class SendTaskRequest < JSONRPCRequest
+  class SendTaskRequest < JSONRPC::Request
     # @return [String] Method name for sending a task message.
     METHOD = 'tasks/send'
 

@@ -2,7 +2,7 @@
 
 module A2A
   # Request to set or update the push notification config for a task.
-  class SetTaskPushNotificationRequest < JSONRPCRequest
+  class SetTaskPushNotificationRequest < JSONRPC::Request
     # @return [String] Method name for setting a task notifications.
     METHOD = 'tasks/pushNotification/set'
 
