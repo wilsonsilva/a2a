@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module A2A
-  # Response to a `tasks/pushNotification/set` request. Contains the TaskPushNotificationConfig or an error.
+  # Response to a `tasks/pushNotificationConfig/set` request. Contains the TaskPushNotificationConfig or an error.
   class SetTaskPushNotificationResponse < JSONRPC::Response
     # @return [TaskPushNotificationConfig, nil] The push notification config if successful.
     attribute? :result, Types::Constructor(TaskPushNotificationConfig).optional

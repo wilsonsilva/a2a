@@ -6,7 +6,7 @@ module A2A
     # @return [String] The name of the organization providing the agent.
     attribute :organization, Types::String
 
-    # @return [String, nil] URL associated with the agent provider.
-    attribute? :url, Types::String.optional
+    # @return [String] A URL for the agent provider's website or relevant documentation.
+    attribute :url, Types::String
   end
 end

@@ -8,12 +8,26 @@ FactoryBot.define do
       streaming { false }
       push_notifications { false }
       state_transition_history { false }
+      extensions { nil }
     end
 
     trait :fully_capable do
       streaming { true }
       push_notifications { true }
       state_transition_history { true }
+      extensions { nil }
+    end
+
+    trait :with_extensions do
+      streaming { true }
+      push_notifications { true }
+      state_transition_history { false }
+      extensions do
+        [
+          build(:agent_extension, :optional_extension),
+          build(:agent_extension, :required_extension)
+        ]
+      end
     end
 
     incapable

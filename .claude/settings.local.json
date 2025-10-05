@@ -6,7 +6,16 @@
       "Bash(mv:*)",
       "WebFetchTool(domain:raw.githubusercontent.com)",
       "Bash(cat:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:dry-rb.org)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(ruby:*)",
+      "Read(//Users/wilson/projects/rb/jsonrpc-middleware/lib/jsonrpc/**)",
+      "Read(//Users/wilson/projects/rb/jsonrpc-middleware/**)",
+      "Bash(xargs:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle exec:*)"
     ]
   },
   "enableAllProjectMcpServers": false

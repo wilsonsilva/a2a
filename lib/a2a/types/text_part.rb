@@ -1,15 +1,12 @@
 # frozen_string_literal: true
 
 module A2A
-  # Represents a part of a message containing text content.
-  class TextPart < ProtocolStruct
-    # @return [String] Type identifier for this part.
-    attribute :type, Types::String.constant('text')
+  # Represents a text segment within a message or artifact.
+  class TextPart < PartBase
+    # @return [String] The type of this part, used as a discriminator. Always 'text'.
+    attribute :kind, Types::String.constant('text')
 
-    # @return [String] The text content.
+    # @return [String] The string content of the text part.
     attribute :text, Types::String
-
-    # @return [Hash, nil] Optional metadata associated with this text part.
-    attribute? :metadata, Types::Hash.optional
   end
 end

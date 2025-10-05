@@ -3,6 +3,7 @@
 RSpec.describe A2A::AgentSkill do
   describe '.new' do
     context 'when given attributes with snake case keys' do
+      # Attributes defined in the factory are snake case
       let(:agent_skill_attributes) { attributes_for(:agent_skill) }
 
       it 'initializes an agent skill' do
@@ -29,15 +30,13 @@ RSpec.describe A2A::AgentSkill do
 
     context 'when the optional attributes are missing' do
       let(:agent_skill_attributes) do
-        attributes_for(:agent_skill).except(:description, :tags, :examples, :input_modes, :output_modes)
+        attributes_for(:agent_skill).except(:examples, :input_modes, :output_modes)
       end
 
       it 'initializes an agent skill', :aggregate_failures do
         agent_skill = described_class.new(agent_skill_attributes)
 
         expect(agent_skill).to be_a(described_class)
-        expect(agent_skill.description).to be_nil
-        expect(agent_skill.tags).to be_nil
         expect(agent_skill.examples).to be_nil
         expect(agent_skill.input_modes).to be_nil
         expect(agent_skill.output_modes).to be_nil
@@ -45,7 +44,7 @@ RSpec.describe A2A::AgentSkill do
     end
 
     context 'when the required attributes are missing' do
-      let(:agent_skill_attributes) { attributes_for(:agent_skill).except(:id, :name) }
+      let(:agent_skill_attributes) { attributes_for(:agent_skill).except(:id, :name, :description, :tags) }
 
       it 'raises an error' do
         expect { described_class.new(agent_skill_attributes) }.to raise_error(Dry::Struct::Error)
@@ -64,7 +63,8 @@ RSpec.describe A2A::AgentSkill do
         tags: %w[maps routing navigation],
         examples: ['plan my route from Sunnyvale to Mountain View'],
         input_modes: ['text/plain'],
-        output_modes: %w[application/html video/mp4]
+        output_modes: %w[application/html video/mp4],
+        security: nil
       )
     end
   end
@@ -126,6 +126,48 @@ RSpec.describe A2A::AgentSkill do
       agent_skill = described_class.from_json(json_string)
 
       expect(agent_skill).to be_a(described_class)
+    end
+
+    it 'parses id' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.id).to eq('route-planner')
+    end
+
+    it 'parses name' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.name).to eq('Route planning')
+    end
+
+    it 'parses description' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.description).to eq('Helps plan routing between two locations')
+    end
+
+    it 'parses tags' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.tags).to eq(%w[maps routing navigation])
+    end
+
+    it 'parses examples' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.examples).to eq(['plan my route from Sunnyvale to Mountain View'])
+    end
+
+    it 'parses input_modes' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.input_modes).to eq(['text/plain'])
+    end
+
+    it 'parses output_modes' do
+      agent_skill = described_class.from_json(json_string)
+
+      expect(agent_skill.output_modes).to eq(%w[application/html video/mp4])
     end
   end
 end

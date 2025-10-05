@@ -11,5 +11,8 @@ module A2A
 
     # @return [Boolean] Indicates if the agent supports providing state transition history.
     attribute? :state_transition_history, Types::Bool.default(false)
+
+    # @return [Array<AgentExtension>, nil] A list of protocol extensions supported by the agent.
+    attribute? :extensions, Types::Array.of(Types::Constructor(AgentExtension)).optional
   end
 end

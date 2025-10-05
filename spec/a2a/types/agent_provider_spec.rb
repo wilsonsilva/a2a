@@ -2,7 +2,7 @@
 
 RSpec.describe A2A::AgentProvider do
   describe '.new' do
-    context 'when given attributes with snake case keys' do
+    context 'when given all required attributes' do
       let(:agent_provider_attributes) { attributes_for(:agent_provider) }
 
       it 'initializes an agent provider' do
@@ -12,23 +12,8 @@ RSpec.describe A2A::AgentProvider do
       end
     end
 
-    context 'when the optional attributes are missing' do
-      let(:agent_provider_attributes) do
-        attributes_for(:agent_provider).except(:url)
-      end
-
-      it 'initializes an agent provider', :aggregate_failures do
-        agent_provider = described_class.new(agent_provider_attributes)
-
-        expect(agent_provider).to be_a(described_class)
-        expect(agent_provider.url).to be_nil
-      end
-    end
-
     context 'when the required attributes are missing' do
-      let(:agent_provider_attributes) do
-        attributes_for(:agent_provider).except(:organization)
-      end
+      let(:agent_provider_attributes) { attributes_for(:agent_provider).except(:organization, :url) }
 
       it 'raises an error' do
         expect { described_class.new(agent_provider_attributes) }.to raise_error(Dry::Struct::Error)
@@ -89,6 +74,18 @@ RSpec.describe A2A::AgentProvider do
       agent_provider = described_class.from_json(json_string)
 
       expect(agent_provider).to be_a(described_class)
+    end
+
+    it 'parses organization' do
+      agent_provider = described_class.from_json(json_string)
+
+      expect(agent_provider.organization).to eq('Google')
+    end
+
+    it 'parses url' do
+      agent_provider = described_class.from_json(json_string)
+
+      expect(agent_provider.url).to eq('https://google.com')
     end
   end
 end

@@ -38,36 +38,42 @@ Install the gem by executing:
 ```ruby
 require 'a2a'
 
-# Create a task send parameters object
-task_params = A2A::TaskSendParams.new(
-  id: 'task-123',
-  session_id: 'session-456',
-  message: {
-    content: 'Plan a trip to Paris',
-    role: 'user'
-  }
+# Create message parts
+text_part = A2A::TextPart.new(text: 'Plan a trip to Paris')
+
+# Create a message
+message = A2A::Message.new(
+  role: 'user',
+  parts: [text_part],
+  message_id: 'msg-123',
+  kind: 'message'
+)
+
+# Create message send parameters object
+message_params = A2A::MessageSendParams.new(
+  message: message
 )
 
 # Build a JSON-RPC request object (no actual network request is made)
-request = A2A::SendTaskRequest.new(
+request = A2A::SendMessageRequest.new(
   id: 1,
-  params: task_params
+  params: message_params
 )
 
 # Convert to JSON with camelCase formatting (as per protocol spec)
 json_request = request.to_json
 puts json_request
-# => {"jsonrpc":"2.0","id":1,"method":"tasks/send","params":{"id":"task-123","sessionId":"session-456","message":{"content":"Plan a trip to Paris","role":"user"}}}
+# => {"jsonrpc":"2.0","id":1,"method":"message/send","params":{"message":{"role":"user","parts":[{"kind":"text","text":"Plan a trip to Paris"}],"messageId":"msg-123","kind":"message"}}}
 
 # Parse a JSON response string
-agent_response = '{"jsonrpc":"2.0","id":1,"result":{"id":"task-123","status":"success","history":[{"role":"user","content":"Plan a trip to Paris"}]}}'
+agent_response = '{"jsonrpc":"2.0","id":1,"result":{"id":"task-123","contextId":"ctx-456","status":{"state":"completed"},"kind":"task"}}'
 
 # Method 1: Parse the JSON first, then create the object
 response_data = JSON.parse(agent_response)
-response = A2A::SendTaskResponse.new(response_data)
+response = A2A::SendMessageResponse.new(response_data)
 
 # Method 2: Directly create the object from JSON (using the new from_json method)
-response = A2A::SendTaskResponse.from_json(agent_response)
+response = A2A::SendMessageResponse.from_json(agent_response)
 
 # Access the task information
 if response.result

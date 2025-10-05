@@ -4,7 +4,7 @@ module A2A
   # Request to retrieve the currently configured push notification configuration for a task.
   class GetTaskPushNotificationRequest < JSONRPC::Request
     # @return [String] Method name for getting task notification configuration.
-    METHOD = 'tasks/pushNotification/get'
+    METHOD = 'tasks/pushNotificationConfig/get'
 
     # @return [String] Method name for getting task notification configuration.
     attribute :method, Types::String.constant(METHOD)

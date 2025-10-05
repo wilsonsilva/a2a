@@ -12,6 +12,7 @@ FactoryBot.define do
       examples { ['plan my route from Sunnyvale to Mountain View'] }
       input_modes { ['text/plain'] }
       output_modes { %w[application/html video/mp4] }
+      security { nil }
     end
 
     trait :custom_map do
@@ -22,6 +23,11 @@ FactoryBot.define do
       examples { ['show me my favorite restaurants on the map'] }
       input_modes { ['text/plain'] }
       output_modes { ['application/html'] }
+      security { nil }
+    end
+
+    trait :with_security do
+      security { [{ 'apiKey' => [] }] }
     end
 
     route_planner
