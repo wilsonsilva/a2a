@@ -19,7 +19,7 @@ group :development do
   gem 'rake', '~> 13.3'
   gem 'rbs', '~> 3.9'
   gem 'rspec', '~> 3.13'
-  gem 'rubocop', '~> 1.80'
+  gem 'rubocop', '~> 1.81'
   gem 'rubocop-factory_bot', '~> 2.27'
   gem 'rubocop-performance', '~> 1.26'
   gem 'rubocop-rake', '~> 0.7'
