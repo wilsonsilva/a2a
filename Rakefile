@@ -14,9 +14,7 @@ yardstick_options = YAML.load_file('.yardstick.yml')
 
 Bundler::Audit::Task.new
 RSpec::Core::RakeTask.new(:spec)
-RuboCop::RakeTask.new do |task|
-  task.requires << 'rubocop-yard'
-end
+RuboCop::RakeTask.new
 YARD::Rake::YardocTask.new
 YardJunk::Rake.define_task
 Yardstick::Rake::Measurement.new(:yardstick_measure, yardstick_options)
