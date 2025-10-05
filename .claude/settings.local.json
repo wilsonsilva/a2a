@@ -15,7 +15,8 @@
       "Read(//Users/wilson/projects/rb/jsonrpc-middleware/**)",
       "Bash(xargs:*)",
       "Bash(bundle exec rspec:*)",
-      "Bash(bundle exec:*)"
+      "Bash(bundle exec:*)",
+      "Bash(bundle:*)"
     ]
   },
   "enableAllProjectMcpServers": false
