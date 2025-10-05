@@ -29,7 +29,7 @@ RSpec.describe A2A::AgentInterface do
 
     it 'converts the agent interface to a hash' do
       expect(agent_interface.to_h).to eq(
-        url: 'https://georoute-agent.example.com/a2a/v1',
+        url: URI('https://georoute-agent.example.com/a2a/v1'),
         transport: 'JSONRPC'
       )
     end
@@ -82,7 +82,7 @@ RSpec.describe A2A::AgentInterface do
     it 'parses url' do
       agent_interface = described_class.from_json(json_string)
 
-      expect(agent_interface.url).to eq('https://georoute-agent.example.com/a2a/v1')
+      expect(agent_interface.url).to eq(URI('https://georoute-agent.example.com/a2a/v1'))
     end
 
     it 'parses transport' do

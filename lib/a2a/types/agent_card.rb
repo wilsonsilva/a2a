@@ -15,9 +15,9 @@ module A2A
     #   in understanding its purpose.
     attribute :description, Types::String
 
-    # @return [String] The preferred endpoint URL for interacting with the agent.
+    # @return [URI] The preferred endpoint URL for interacting with the agent.
     #   This URL MUST support the transport specified by 'preferred_transport'.
-    attribute :url, Types::String
+    attribute :url, Types::URI
 
     # @return [String] The transport protocol for the preferred endpoint (the main 'url' field).
     #   If not specified, defaults to 'JSONRPC'.
@@ -27,8 +27,8 @@ module A2A
     #   This allows agents to expose multiple transports, potentially at different URLs.
     attribute? :additional_interfaces, Types::Array.of(Types::Constructor(AgentInterface)).optional
 
-    # @return [String, nil] An optional URL to an icon for the agent.
-    attribute? :icon_url, Types::String.optional
+    # @return [URI, nil] An optional URL to an icon for the agent.
+    attribute? :icon_url, Types::URI.optional
 
     # @return [AgentProvider, nil] Information about the provider of the agent.
     attribute? :provider, Types::Constructor(AgentProvider).optional
@@ -36,8 +36,8 @@ module A2A
     # @return [String] The agent's own version number. The format is defined by the provider.
     attribute :version, Types::String
 
-    # @return [String, nil] An optional URL to the agent's documentation.
-    attribute? :documentation_url, Types::String.optional
+    # @return [URI, nil] An optional URL to the agent's documentation.
+    attribute? :documentation_url, Types::URI.optional
 
     # @return [AgentCapabilities] A declaration of optional capabilities supported by the agent.
     attribute :capabilities, Types::Constructor(AgentCapabilities)

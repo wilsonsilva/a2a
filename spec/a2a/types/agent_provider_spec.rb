@@ -27,7 +27,7 @@ RSpec.describe A2A::AgentProvider do
     it 'converts the agent provider to a hash' do
       expect(agent_provider.to_h).to eq(
         organization: 'Google',
-        url: 'https://google.com'
+        url: URI('https://google.com')
       )
     end
   end
@@ -85,7 +85,7 @@ RSpec.describe A2A::AgentProvider do
     it 'parses url' do
       agent_provider = described_class.from_json(json_string)
 
-      expect(agent_provider.url).to eq('https://google.com')
+      expect(agent_provider.url).to eq(URI('https://google.com'))
     end
   end
 end

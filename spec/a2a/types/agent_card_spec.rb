@@ -91,29 +91,29 @@ RSpec.describe A2A::AgentCard do
         description: 'Provides advanced route planning, traffic analysis, and custom map generation ' \
                      'services. This agent can calculate optimal routes, estimate travel times considering ' \
                      'real-time traffic, and create personalized maps with points of interest.',
-        url: 'https://georoute-agent.example.com/a2a/v1',
+        url: URI('https://georoute-agent.example.com/a2a/v1'),
         preferred_transport: 'JSONRPC',
         additional_interfaces: [
           {
-            url: 'https://georoute-agent.example.com/a2a/v1',
+            url: URI('https://georoute-agent.example.com/a2a/v1'),
             transport: 'JSONRPC'
           },
           {
-            url: 'https://georoute-agent.example.com/a2a/grpc',
+            url: URI('https://georoute-agent.example.com/a2a/grpc'),
             transport: 'GRPC'
           },
           {
-            url: 'https://georoute-agent.example.com/a2a/json',
+            url: URI('https://georoute-agent.example.com/a2a/json'),
             transport: 'HTTP+JSON'
           }
         ],
-        icon_url: 'https://georoute-agent.example.com/icon.png',
+        icon_url: URI('https://georoute-agent.example.com/icon.png'),
         provider: {
           organization: 'Google',
-          url: 'https://google.com'
+          url: URI('https://google.com')
         },
         version: '1.2.0',
-        documentation_url: 'https://docs.examplegeoservices.com/georoute-agent/api',
+        documentation_url: URI('https://docs.examplegeoservices.com/georoute-agent/api'),
         capabilities: {
           streaming: true,
           push_notifications: true,
@@ -123,7 +123,7 @@ RSpec.describe A2A::AgentCard do
         security_schemes: {
           'google' => {
             type: 'openIdConnect',
-            open_id_connect_url: 'https://accounts.google.com/.well-known/openid-configuration',
+            open_id_connect_url: URI('https://accounts.google.com/.well-known/openid-configuration'),
             description: 'Google OpenID Connect authentication'
           }
         },
@@ -437,7 +437,7 @@ RSpec.describe A2A::AgentCard do
     it 'parses url' do
       agent_card = described_class.from_json(json_string)
 
-      expect(agent_card.url).to eq('https://georoute-agent.example.com/a2a/v1')
+      expect(agent_card.url).to eq(URI('https://georoute-agent.example.com/a2a/v1'))
     end
 
     it 'parses preferred_transport' do
@@ -455,13 +455,13 @@ RSpec.describe A2A::AgentCard do
     it 'parses icon_url' do
       agent_card = described_class.from_json(json_string)
 
-      expect(agent_card.icon_url).to eq('https://georoute-agent.example.com/icon.png')
+      expect(agent_card.icon_url).to eq(URI('https://georoute-agent.example.com/icon.png'))
     end
 
     it 'parses documentation_url' do
       agent_card = described_class.from_json(json_string)
 
-      expect(agent_card.documentation_url).to eq('https://docs.examplegeoservices.com/georoute-agent/api')
+      expect(agent_card.documentation_url).to eq(URI('https://docs.examplegeoservices.com/georoute-agent/api'))
     end
 
     it 'parses supports_authenticated_extended_card' do

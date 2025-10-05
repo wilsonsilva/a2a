@@ -9,8 +9,8 @@ module A2A
     # @return [OAuthFlows] An object containing configuration information for the supported OAuth 2.0 flows.
     attribute :flows, Types::Constructor(OAuthFlows)
 
-    # @return [String, nil] URL to the oauth2 authorization server metadata
+    # @return [URI, nil] URL to the oauth2 authorization server metadata
     #   RFC8414. TLS is required.
-    attribute? :oauth2_metadata_url, Types::String.optional
+    attribute? :oauth2_metadata_url, Types::URI.optional
   end
 end

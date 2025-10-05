@@ -3,7 +3,7 @@
 module A2A
   # A declaration of a protocol extension supported by an Agent.
   class AgentExtension < ProtocolStruct
-    # @return [URI, String] The unique URI identifying the extension.
+    # @return [URI] The unique URI identifying the extension.
     attribute :uri, Types::URI
 
     # @return [String, nil] A human-readable description of how this agent uses the extension.

@@ -7,8 +7,8 @@ module A2A
     #   to support multiple notification callbacks.
     attribute? :id, Types::String.optional
 
-    # @return [String] The callback URL where the agent should send push notifications.
-    attribute :url, Types::String
+    # @return [URI] The callback URL where the agent should send push notifications.
+    attribute :url, Types::URI
 
     # @return [String, nil] A unique token for this task or session to validate incoming push notifications.
     attribute? :token, Types::String.optional

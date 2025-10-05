@@ -6,7 +6,7 @@ module A2A
     # @return [String] The type of the security scheme. Must be 'openIdConnect'.
     attribute :type, Types::String.constant('openIdConnect')
 
-    # @return [String] The OpenID Connect Discovery URL for the OIDC provider's metadata.
-    attribute :open_id_connect_url, Types::String
+    # @return [URI] The OpenID Connect Discovery URL for the OIDC provider's metadata.
+    attribute :open_id_connect_url, Types::URI
   end
 end

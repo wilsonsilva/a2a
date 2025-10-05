@@ -59,7 +59,7 @@ RSpec.describe A2A::OpenIdConnectSecurityScheme do
     it 'converts the security scheme to a hash' do
       expect(security_scheme.to_h).to eq(
         type: 'openIdConnect',
-        open_id_connect_url: 'https://accounts.google.com/.well-known/openid-configuration',
+        open_id_connect_url: URI('https://accounts.google.com/.well-known/openid-configuration'),
         description: 'Google OpenID Connect authentication'
       )
     end
@@ -121,7 +121,7 @@ RSpec.describe A2A::OpenIdConnectSecurityScheme do
     it 'parses open_id_connect_url' do
       security_scheme = described_class.from_json(json_string)
 
-      expect(security_scheme.open_id_connect_url).to eq('https://accounts.google.com/.well-known/openid-configuration')
+      expect(security_scheme.open_id_connect_url).to eq(URI('https://accounts.google.com/.well-known/openid-configuration'))
     end
 
     it 'parses description' do
