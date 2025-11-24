@@ -3,7 +3,6 @@
 require 'dry/inflector'
 require 'zeitwerk'
 require 'jsonrpc'
-require 'a2a/rails/railtie' if defined?(Rails)
 
 # Encapsulates all the gem's logic
 module A2A
